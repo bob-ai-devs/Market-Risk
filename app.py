@@ -1,9 +1,6 @@
 import streamlit as st
 
-# from financial_risk import main as financial_risk_main
-# from esg import main as esg_main
-# from multilingual import main as multilingual_main
-
+from index_analyzer import main as analyzer_main()
 
 # ============================================================
 # PAGE CONFIG
@@ -88,10 +85,10 @@ if "selected_app" not in st.session_state:
 
 APPLICATIONS = [
     {
-        "id": "financial",
+        "id": "scraper",
         "number": "01",
         "icon": "📊",
-        "title": "Index Scrapper",
+        "title": "Index Scraper",
         "description": (
             "Generate stock, company and ETF-wise insights by analyzing "
             "market data, financial information and relevant market signals."
@@ -103,7 +100,7 @@ APPLICATIONS = [
         ],
     },
     {
-        "id": "esg",
+        "id": "analyzer",
         "number": "02",
         "icon": "📈",
         "title": "Index Analyzer",
@@ -118,7 +115,7 @@ APPLICATIONS = [
         ],
     },
     {
-        "id": "multilingual",
+        "id": "predict",
         "number": "03",
         "icon": "🔮",
         "title": "Index Predictor",
@@ -266,17 +263,17 @@ def run_selected_application():
     # Launch Selected Application
     # --------------------------------------------------------
 
-    if selected_app == "financial":
+    if selected_app == "scraper":
 
-        financial_risk_main()
+        scraper_main()
 
-    elif selected_app == "esg":
+    elif selected_app == "analyzer":
 
-        esg_main()
+        analyzer_main()
 
-    elif selected_app == "multilingual":
+    elif selected_app == "predict":
 
-        multilingual_main()
+        predict_main()
 
 
 # ============================================================
