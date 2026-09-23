@@ -1,294 +1,59 @@
 import streamlit as st
 
+from financial_risk import main as financial_risk_main
+from esg import main as esg_main
+from multilingual import main as multilingual_main
 
-# =========================================================
+
+# ============================================================
 # PAGE CONFIG
-# =========================================================
+# ============================================================
 
 st.set_page_config(
-    page_title="BOB AI Application Portal",
+    page_title="BOB AI Solutions Hub",
     page_icon="🏦",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
 
-# =========================================================
-# COLORS
-# =========================================================
+# ============================================================
+# BOB COLORS
+# ============================================================
 
 BOB_NAVY = "#002E6E"
 BOB_BLUE = "#0059B3"
 BOB_ORANGE = "#F7941D"
+LIGHT_BG = "#F5F7FA"
 
-LIGHT_BG = "#F4F7FB"
-CARD_BORDER = "#E1E7F0"
-TEXT = "#172B4D"
-MUTED = "#667085"
 
-
-# =========================================================
-# CSS
-# =========================================================
-
-st.markdown(
-    f"""
-    <style>
-
-    /* =====================================================
-       PAGE
-       ===================================================== */
-
-    .stApp {{
-        background: {LIGHT_BG};
-    }}
-
-    .block-container {{
-        max-width: 1280px;
-        padding-top: 35px;
-        padding-bottom: 40px;
-    }}
-
-
-    /* =====================================================
-       HEADER
-       ===================================================== */
-
-    .portal-title {{
-        color: {BOB_NAVY};
-        font-size: 36px;
-        font-weight: 750;
-        letter-spacing: -0.8px;
-        margin-bottom: 3px;
-    }}
-
-    .portal-subtitle {{
-        color: {MUTED};
-        font-size: 16px;
-        margin-bottom: 32px;
-    }}
-
-
-    /* =====================================================
-       TOP ACCENT
-       ===================================================== */
-
-    .top-line {{
-        height: 5px;
-        width: 75px;
-        background: {BOB_ORANGE};
-        border-radius: 10px;
-        margin-bottom: 18px;
-    }}
-
-
-    /* =====================================================
-       CARD
-       ===================================================== */
-
-    .card {{
-        background: white;
-        border: 1px solid {CARD_BORDER};
-        border-radius: 20px;
-
-        padding: 28px;
-
-        min-height: 355px;
-
-        box-shadow:
-            0 5px 20px rgba(16, 24, 40, 0.06);
-
-        position: relative;
-    }}
-
-
-    /* =====================================================
-       CARD TOP
-       ===================================================== */
-
-    .card-top {{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        margin-bottom: 25px;
-    }}
-
-    .number {{
-        color: #B6C2D4;
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: 1px;
-    }}
-
-    .available {{
-        color: #18794E;
-        background: #ECFDF3;
-
-        border-radius: 20px;
-
-        padding: 5px 10px;
-
-        font-size: 11px;
-        font-weight: 650;
-    }}
-
-
-    /* =====================================================
-       ICON
-       ===================================================== */
-
-    .icon-box {{
-        width: 72px;
-        height: 72px;
-
-        border-radius: 18px;
-
-        background: linear-gradient(
-            135deg,
-            #FFF5E8,
-            #FFE5C2
-        );
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        font-size: 37px;
-
-        margin-bottom: 23px;
-    }}
-
-
-    /* =====================================================
-       CARD TITLE
-       ===================================================== */
-
-    .card-title {{
-        color: {BOB_NAVY};
-
-        font-size: 22px;
-        font-weight: 750;
-
-        line-height: 1.28;
-
-        margin-bottom: 12px;
-    }}
-
-
-    /* =====================================================
-       DESCRIPTION
-       ===================================================== */
-
-    .card-description {{
-        color: {MUTED};
-
-        font-size: 14px;
-
-        line-height: 1.65;
-
-        min-height: 72px;
-    }}
-
-
-    /* =====================================================
-       BUTTON
-       ===================================================== */
-
-    div.stButton {{
-        margin-top: -8px;
-    }}
-
-    div.stButton > button {{
-        width: 100%;
-
-        height: 48px;
-
-        border-radius: 10px;
-
-        background: {BOB_NAVY};
-
-        color: white;
-
-        border: none;
-
-        font-size: 14px;
-
-        font-weight: 650;
-
-        transition: 0.2s ease;
-    }}
-
-    div.stButton > button:hover {{
-        background: {BOB_ORANGE};
-
-        color: white;
-
-        border: none;
-
-        box-shadow:
-            0 6px 15px rgba(247, 148, 29, 0.25);
-    }}
-
-
-    /* =====================================================
-       FOOTER
-       ===================================================== */
-
-    .footer {{
-        text-align: center;
-
-        color: #98A2B3;
-
-        font-size: 12px;
-
-        margin-top: 45px;
-    }}
-
-
-    /* =====================================================
-       APP SCREEN
-       ===================================================== */
-
-    .app-heading {{
-        color: {BOB_NAVY};
-
-        font-size: 28px;
-
-        font-weight: 750;
-
-        margin-bottom: 5px;
-    }}
-
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# =========================================================
+# ============================================================
 # SESSION STATE
-# =========================================================
+# ============================================================
 
 if "selected_app" not in st.session_state:
     st.session_state.selected_app = None
 
 
-# =========================================================
-# APPLICATION DATA
-# =========================================================
+# ============================================================
+# APPLICATION DEFINITIONS
+# ============================================================
 
-applications = [
+APPLICATIONS = [
     {
         "id": "financial",
         "number": "01",
         "icon": "📊",
         "title": "AI Financial Risk",
         "description": (
-            "AI-powered financial risk and reputation analysis "
-            "combining financial indicators, market information "
-            "and news sentiment."
+            "AI-powered financial risk and reputation analysis combining "
+            "financial indicators, market information and news intelligence."
         ),
+        "features": [
+            "Financial risk indicators",
+            "Market intelligence",
+            "News & reputation analysis",
+        ],
     },
     {
         "id": "esg",
@@ -296,10 +61,14 @@ applications = [
         "icon": "🌱",
         "title": "AI ESG Analytics",
         "description": (
-            "Analyze Environmental, Social and Governance signals "
-            "using AI-powered news intelligence, sentiment analysis "
-            "and ESG scoring."
+            "AI-powered Environmental, Social and Governance analytics "
+            "using news intelligence, sentiment analysis and ESG scoring."
         ),
+        "features": [
+            "Environmental, Social & Governance scoring",
+            "News intelligence",
+            "ESG trends & monitoring",
+        ],
     },
     {
         "id": "multilingual",
@@ -307,197 +76,153 @@ applications = [
         "icon": "🌐",
         "title": "AI Multilingual Assistant",
         "description": (
-            "Intelligent multilingual banking assistance with "
-            "speech recognition, translation and AI-powered "
-            "product interaction."
+            "Intelligent multilingual banking assistance with speech "
+            "recognition, translation and AI-powered product interaction."
         ),
+        "features": [
+            "Speech recognition",
+            "Multilingual translation",
+            "Banking product assistance",
+        ],
     },
 ]
 
 
-# =========================================================
+# ============================================================
 # PORTAL
-# =========================================================
+# ============================================================
 
-if st.session_state.selected_app is None:
+def show_portal():
 
-    # -----------------------------------------------------
-    # HEADER
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # Header
+    # --------------------------------------------------------
 
-    st.markdown(
-        '<div class="top-line"></div>',
-        unsafe_allow_html=True,
-    )
+    st.markdown("## 🏦 Bank of Baroda")
 
     st.markdown(
-        "🏦 Bank of Baroda",
-        unsafe_allow_html=False,
+        f"# AI Solutions Hub"
     )
 
-    st.markdown(
-        '<div class="portal-title">AI Application Portal</div>',
-        unsafe_allow_html=True,
+    st.caption(
+        "AI & Emerging Technologies  •  Intelligent Banking Solutions"
     )
 
-    st.markdown(
-        '<div class="portal-subtitle">'
-        'AI &amp; Emerging Technologies&nbsp;&nbsp;•&nbsp;&nbsp;'
-        'Intelligent Banking Solutions'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+    st.divider()
+
+    st.markdown("### Explore AI Applications")
+    st.caption("Select an application below to launch the solution.")
+
+    st.write("")
 
 
-    # -----------------------------------------------------
-    # CARDS
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # Cards
+    # --------------------------------------------------------
 
-    col1, col2, col3 = st.columns(
-        3,
-        gap="large",
-    )
+    col1, col2, col3 = st.columns(3, gap="large")
 
+    columns = [col1, col2, col3]
 
-    for col, app in zip(
-        [col1, col2, col3],
-        applications,
-    ):
+    for col, app in zip(columns, APPLICATIONS):
 
         with col:
 
-            # Card
-            st.markdown(
-                f"""
-                <div class="card">
+            # Native Streamlit card
+            with st.container(border=True):
 
-                    <div class="card-top">
+                # Application number
+                st.caption(
+                    f"APPLICATION {app['number']}  •  🟢 AVAILABLE"
+                )
 
-                        <span class="number">
-                            APPLICATION {app["number"]}
-                        </span>
+                # Icon
+                st.markdown(
+                    f"## {app['icon']}"
+                )
 
-                        <span class="available">
-                            ● AVAILABLE
-                        </span>
+                # Title
+                st.markdown(
+                    f"### {app['title']}"
+                )
 
-                    </div>
+                # Description
+                st.write(
+                    app["description"]
+                )
 
-                    <div class="icon-box">
-                        {app["icon"]}
-                    </div>
+                st.write("")
 
-                    <div class="card-title">
-                        {app["title"]}
-                    </div>
+                # Capabilities
+                st.markdown("**Key capabilities**")
 
-                    <div class="card-description">
-                        {app["description"]}
-                    </div>
+                for feature in app["features"]:
+                    st.write(f"• {feature}")
 
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+                st.write("")
 
-            # Button outside card
-            if st.button(
-                "Launch Application  →",
-                key=f"launch_{app['id']}",
-                use_container_width=True,
-            ):
-                st.session_state.selected_app = app["id"]
-                st.rerun()
+                # Launch button
+                if st.button(
+                    "Launch Application  →",
+                    key=f"launch_{app['id']}",
+                    use_container_width=True,
+                ):
+                    st.session_state.selected_app = app["id"]
+                    st.rerun()
 
 
-    # -----------------------------------------------------
-    # FOOTER
-    # -----------------------------------------------------
+    # --------------------------------------------------------
+    # Footer
+    # --------------------------------------------------------
 
-    st.markdown(
-        """
-        <div class="footer">
-            Bank of Baroda &nbsp;|&nbsp;
-            AI & Emerging Technologies
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.write("")
+    st.divider()
+
+    st.caption(
+        "Bank of Baroda  |  AI & Emerging Technologies"
     )
 
 
-# =========================================================
-# APPLICATION ROUTING
-# =========================================================
+# ============================================================
+# APPLICATION ROUTER
+# ============================================================
 
-else:
+def run_selected_application():
 
-    selected = st.session_state.selected_app
+    selected_app = st.session_state.selected_app
 
-
-    # -----------------------------------------------------
-    # BACK
-    # -----------------------------------------------------
-
+    # Back button
     if st.button(
-        "←  Back to AI Applications",
+        "← Back to AI Solutions Hub",
         key="back_to_portal",
     ):
         st.session_state.selected_app = None
         st.rerun()
 
+    st.divider()
 
-    st.markdown("")
-
-
-    # -----------------------------------------------------
-    # FINANCIAL RISK
-    # -----------------------------------------------------
-
-    if selected == "financial":
-
-        st.markdown(
-            '<div class="app-heading">'
-            '📊 AI Financial Risk'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        from financial_risk import main as financial_risk_main
+    # Run selected application
+    if selected_app == "financial":
 
         financial_risk_main()
 
-
-    # -----------------------------------------------------
-    # ESG
-    # -----------------------------------------------------
-
-    elif selected == "esg":
-
-        st.markdown(
-            '<div class="app-heading">'
-            '🌱 AI ESG Analytics'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        from esg import main as esg_main
+    elif selected_app == "esg":
 
         esg_main()
 
-
-    # -----------------------------------------------------
-    # MULTILINGUAL
-    # -----------------------------------------------------
-
-    elif selected == "multilingual":
-
-        st.markdown(
-            '<div class="app-heading">'
-            '🌐 AI Multilingual Assistant'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        from multilingual import main as multilingual_main
+    elif selected_app == "multilingual":
 
         multilingual_main()
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+if st.session_state.selected_app is None:
+
+    show_portal()
+
+else:
+
+    run_selected_application()
