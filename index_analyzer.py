@@ -346,7 +346,7 @@ def main():
                     )
     
     if st.session_state.analyzer_response:
-        with st.expander("📊 AI Analysis Result", expand=True):
+        with st.expander("📊 AI Analysis Result", expanded=True):
             st.markdown(
                 f"**Model Used:** `{selected_model}`"
             )
