@@ -55,30 +55,13 @@ interval_config = {
 # Function to fetch data
 def fetch_change_data():
     results = {}
-
     for index_name, ticker in nse_indices.items():
         try:
-            df = yf.download(
-                ticker,
-                period="max",
-                interval="1d",
-                progress=False
-            )
-
-            # FIX ONLY:
-            # yfinance may now return Close as a DataFrame
-            # even when downloading a single ticker.
-            close_series = df["Close"]
-
-            if isinstance(close_series, pd.DataFrame):
-                close_series = close_series.iloc[:, 0]
-
-            close_series = close_series.dropna().sort_index()
+            df = yf.download(ticker, period="max", interval="1d", progress=False)
+            close_series = df['Close'].dropna().sort_index()
 
             if close_series.empty:
-                results[index_name] = {
-                    label: None for label in interval_config
-                }
+                results[index_name] = {label: None for label in interval_config}
                 continue
 
             last_date = close_series.index[-1]
@@ -96,34 +79,20 @@ def fetch_change_data():
                         past_price = close_series.iloc[0]
                 else:
                     target_date = last_date - timedelta(days=days_needed)
-
                     if target_date < earliest_date:
                         past_price = close_series.iloc[0]
                     else:
-                        nearest = close_series[
-                            close_series.index <= target_date
-                        ]
+                        nearest = close_series[close_series.index <= target_date]
+                        past_price = nearest.iloc[-1] if not nearest.empty else close_series.iloc[0]
 
-                        past_price = (
-                            nearest.iloc[-1]
-                            if not nearest.empty
-                            else close_series.iloc[0]
-                        )
-
-                changes[label] = round(
-                    ((current_price - past_price) / past_price) * 100,
-                    2
-                )
+                changes[label] = round(((current_price - past_price) / past_price) * 100, 2)
 
             results[index_name] = changes
 
         except Exception:
-            results[index_name] = {
-                label: None for label in interval_config
-            }
+            results[index_name] = {label: None for label in interval_config}
 
     return pd.DataFrame(results).T.astype("float")
-
 
 if "response" not in st.session_state:
     st.session_state.response = ""
@@ -137,91 +106,46 @@ if "change_df" not in st.session_state:
 # change_df = st.session_state.change_df
 
 # Sort by '1D' column ascending
-change_df = st.session_state.change_df.sort_values(
-    by='1D',
-    ascending=False
-)
+change_df = st.session_state.change_df.sort_values(by='1D', ascending=False)
+
 
 
 # Single interval bar plot
 def plot_single_bar(df, interval):
     st.subheader(f"📊 NSE Index % Change: {interval}")
-    df_sorted = (
-        df[[interval]]
-        .dropna()
-        .sort_values(interval, ascending=False)
-    )
-
-    fig = go.Figure(
-        go.Bar(
-            x=df_sorted.index,
-            y=df_sorted[interval],
-            text=[f"{v:.2f}%" for v in df_sorted[interval]],
-            textposition="auto",
-            marker_color="royalblue"
-        )
-    )
-
-    fig.update_layout(
-        yaxis_title="% Change",
-        xaxis_title="Index",
-        xaxis_tickangle=-45
-    )
-
+    df_sorted = df[[interval]].dropna().sort_values(interval, ascending=False)
+    fig = go.Figure(go.Bar(
+        x=df_sorted.index,
+        y=df_sorted[interval],
+        text=[f"{v:.2f}%" for v in df_sorted[interval]],
+        textposition="auto",
+        marker_color="royalblue"
+    ))
+    fig.update_layout(yaxis_title="% Change", xaxis_title="Index", xaxis_tickangle=-45)
     st.plotly_chart(fig, use_container_width=True)
-
 
 # Multiple interval grouped bar plot
 def plot_grouped(df, intervals):
     st.subheader("📊 Grouped Index % Changes")
-
-    df_sorted = (
-        df[intervals]
-        .dropna()
-        .sort_values(intervals[0], ascending=False)
-    )
-
+    df_sorted = df[intervals].dropna().sort_values(intervals[0], ascending=False)
     fig = go.Figure()
-
-    colors = [
-        '#1f77b4',
-        '#ff7f0e',
-        '#2ca02c',
-        '#d62728',
-        '#9467bd'
-    ]
-
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
     for i, label in enumerate(intervals):
-        fig.add_trace(
-            go.Bar(
-                x=df_sorted.index,
-                y=df_sorted[label],
-                name=label,
-                marker_color=colors[i % len(colors)],
-                text=[f"{v:.2f}%" for v in df_sorted[label]],
-                textposition="auto"
-            )
-        )
-
-    fig.update_layout(
-        barmode="group",
-        yaxis_title="% Change",
-        xaxis_title="Index",
-        xaxis_tickangle=-45
-    )
-
+        fig.add_trace(go.Bar(
+            x=df_sorted.index,
+            y=df_sorted[label],
+            name=label,
+            marker_color=colors[i % len(colors)],
+            text=[f"{v:.2f}%" for v in df_sorted[label]],
+            textposition="auto"
+        ))
+    fig.update_layout(barmode="group", yaxis_title="% Change", xaxis_title="Index", xaxis_tickangle=-45)
     st.plotly_chart(fig, use_container_width=True)
-
 
 def main():
 
     # Streamlit UI setup
-    st.set_page_config(
-        page_title="NSE Index Analyzer",
-        layout="wide",
-        page_icon="📈"
-    )
-
+    st.set_page_config(page_title="NSE Index Analyzer", layout="wide", page_icon="📈")
     st.title("📈 NSE Index Analyzer")
     
     selected_intervals = st.multiselect(
@@ -236,47 +160,25 @@ def main():
         clamped_df = change_df.clip(lower=-100, upper=100)
     
         # Apply custom gradient scaling between -100 and 100
-        styled = (
-            change_df.style
-            .format(
-                lambda x: f"{x:.2f}%"
-                if pd.notnull(x)
-                else "NA"
-            )
-            .background_gradient(
-                cmap="RdYlGn",
-                vmin=-20,
-                vmax=20,
-                axis=None
-            )
-        )
+        styled = (change_df.style
+                  .format(lambda x: f"{x:.2f}%" if pd.notnull(x) else "NA")
+                  .background_gradient(
+                      cmap="RdYlGn",
+                      vmin=-20,
+                      vmax=20,
+                      axis=None  # Apply to whole DataFrame
+                  ))
     
-        st.dataframe(
-            styled,
-            use_container_width=True
-        )
+        st.dataframe(styled, use_container_width=True)
     
     # Get Gemini models
     # gen_models = [m.name.split("/")[1] for m in genai.list_models()]
-    gen_models = [
-        'gemini-flash-lite-latest',
-        'gemini-flash-latest'
-    ]
+    gen_models = ['gemini-flash-lite-latest', 'gemini-flash-latest']
     
     # AI Query Section
     st.header("🔎 AI Query")
-
-    selected_model = st.selectbox(
-        "Choose AI Model",
-        options=gen_models,
-        index=0
-    )
-
-    user_prompt = st.text_area(
-        "Enter your prompt",
-        placeholder="Type your query here...",
-        max_chars=1000
-    )
+    selected_model = st.selectbox("Choose AI Model", options=gen_models, index=0)
+    user_prompt = st.text_area("Enter your prompt", placeholder="Type your query here...", max_chars=1000)
     
     if st.button("Submit"):
         if not user_prompt.strip():
@@ -285,15 +187,8 @@ def main():
             with st.spinner("Getting analysis..."):
                 try:
                     # Prepare finance data to include in the prompt
-                    data_df = (
-                        change_df
-                        .reset_index()
-                        .rename(columns={"index": "Index Name"})
-                    )
-
-                    finance_data_json = data_df.to_json(
-                        orient="records"
-                    )
+                    data_df = change_df.reset_index().rename(columns={"index": "Index Name"})
+                    finance_data_json = data_df.to_json(orient="records")
         
                     final_prompt = f""" You are a financial data analyst. 
                     You are given percentage-change data for NSE indices. 
@@ -312,57 +207,30 @@ def main():
                     # ----------------------------------------
                     # Generate Gemini response 
                     # ---------------------------------------- 
-                    response = client.models.generate_content(
-                        model=selected_model,
-                        contents=final_prompt
-                    )
-
-                    response_text = getattr(
-                        response,
-                        "text",
-                        None
-                    )
-
+                    response = client.models.generate_content(model=selected_model, contents=final_prompt) 
+                    response_text = getattr(response, "text", None) 
                     if response_text: 
                         st.session_state.response = response_text 
                     else: 
-                        st.session_state.response = (
-                            "No response was returned by Gemini."
-                        )
-
+                        st.session_state.response = "No response was returned by Gemini." 
                 except Exception as e: 
                     st.session_state.response = "" 
-                    st.error(
-                        f"Gemini analysis failed: {e}"
-                    )
+                    st.error(f"Gemini analysis failed: {e}")
     
     if st.session_state.response:
         with st.expander("📊 AI Analysis Result"):
-            st.markdown(
-                f"**Model Used:** `{selected_model}`"
-            )
+            st.markdown(f"**Model Used:** `{selected_model}`")
             st.write(st.session_state.response)
     
     # Show plots
     if selected_intervals:
         if len(selected_intervals) == 1:
-            plot_single_bar(
-                change_df,
-                selected_intervals[0]
-            )
+            plot_single_bar(change_df, selected_intervals[0])
         else:
-            plot_grouped(
-                change_df,
-                selected_intervals
-            )
+            plot_grouped(change_df, selected_intervals)
     else:
-        st.warning(
-            "⚠️ Please select at least one time interval."
-        )
+        st.warning("⚠️ Please select at least one time interval.")
 
-
-# ============================================================
-# STANDALONE EXECUTION
-# ============================================================ 
+# ============================================================ # STANDALONE EXECUTION # ============================================================ 
 if __name__ == "__main__": 
     main()
