@@ -347,9 +347,9 @@ def main():
         st.session_state["last_selection"] = (category, name, view_value, pred_value)
         _run_analysis(category, name, view_value, pred_value)
         dark_rgb = (
-            random.randint(50, 80),
-            random.randint(50, 80),
-            random.randint(50, 80)
+            random.randint(80, 127),
+            random.randint(80, 127),
+            random.randint(80, 127)
         )
         st.session_state.dark_rgb = dark_rgb
 
