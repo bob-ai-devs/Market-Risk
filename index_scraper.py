@@ -337,7 +337,8 @@ def main():
         ai_flagging = st.radio("AI Flagging", ["Not Needed", "Needed"], horizontal=True)
     with col6:
         model_names = _cached_model_names(api_key) if api_key else []
-        model_name = st.selectbox("AI model", options=["Default Model"] + model_names)
+        # model_name = st.selectbox("AI model", options=["Default Model"] + model_names)
+        model_name = st.selectbox("AI model", options=model_names)
         model_name = "" if model_name == "Default Model" else model_name
 
     run_clicked = st.button("Run Analysis", type="primary")
