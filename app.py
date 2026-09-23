@@ -1,9 +1,9 @@
 import streamlit as st
 
-# Import the main() function from each application
-from financial_risk import main as financial_risk_main
-from esg import main as esg_main
-from multilingual import main as multilingual_main
+# # Import the main() function from each application
+# from financial_risk import main as financial_risk_main
+# from esg import main as esg_main
+# from multilingual import main as multilingual_main
 
 
 # =========================================================
