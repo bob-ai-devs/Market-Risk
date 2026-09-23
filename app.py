@@ -184,7 +184,7 @@ def show_portal():
             with st.container(border=True):
 
                 # Application number and availability
-                if col == col2:
+                if col != col3:
                     st.caption(
                         f"APPLICATION {app['number']}  •  🟢 AVAILABLE"
                     )
