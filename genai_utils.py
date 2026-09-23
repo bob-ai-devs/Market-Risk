@@ -29,7 +29,7 @@ def list_model_names(client: genai.Client):
     # except Exception:
     #     pass
     # return sorted(set(names))
-    return ['gemini-flash-lite-latest', 'gemini-flash-latest']
+    return set(['gemini-flash-lite-latest', 'gemini-flash-latest'])
 
 
 def generate_text(client: genai.Client, prompt: str, model: str = "") -> str:
