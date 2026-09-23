@@ -671,3 +671,409 @@ def main():
 
             st.session_state.index_analyzer_change_df = (
                 new_df
+            )
+
+            st.session_state.index_analyzer_failed = (
+                failed_indices
+            )
+
+            st.session_state.index_analyzer_response = ""
+
+    # ========================================================
+    # DATA
+    # ========================================================
+
+    change_df = (
+        st.session_state.index_analyzer_change_df.copy()
+    )
+
+    # ========================================================
+    # FAILED DOWNLOADS
+    # ========================================================
+
+    failed_indices = (
+        st.session_state.index_analyzer_failed
+    )
+
+    if failed_indices:
+
+        with st.expander(
+            "⚠️ Indices with unavailable data",
+            expanded=False,
+        ):
+
+            st.warning(
+                "Some Yahoo Finance downloads failed. "
+                "These values are shown as NA rather than 0."
+            )
+
+            for (
+                index_name,
+                ticker,
+                error,
+            ) in failed_indices:
+
+                st.write(
+                    f"**{index_name}** "
+                    f"`{ticker}` — {error}"
+                )
+
+    # ========================================================
+    # SORT DATA
+    # ========================================================
+
+    if "1D" in change_df.columns:
+
+        change_df = change_df.sort_values(
+            by="1D",
+            ascending=False,
+            na_position="last",
+        )
+
+    # ========================================================
+    # RAW TABLE
+    # ========================================================
+
+    with st.expander(
+        "📋 View Raw % Change Table"
+    ):
+
+        styled = (
+            change_df.style
+            .format(
+                lambda value:
+                f"{value:.2f}%"
+                if pd.notnull(value)
+                else "NA"
+            )
+            .background_gradient(
+                cmap="RdYlGn",
+                vmin=-20,
+                vmax=20,
+                axis=None,
+            )
+        )
+
+        st.dataframe(
+            styled,
+            use_container_width=True,
+        )
+
+    # ========================================================
+    # DATA STATUS
+    # ========================================================
+
+    total_indices = len(change_df)
+
+    successful_indices = (
+        change_df.notna()
+        .any(axis=1)
+        .sum()
+    )
+
+    failed_count = (
+        total_indices
+        - successful_indices
+    )
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        st.metric(
+            "Total Indices",
+            total_indices,
+        )
+
+    with col2:
+
+        st.metric(
+            "Data Available",
+            successful_indices,
+        )
+
+    with col3:
+
+        st.metric(
+            "Data Unavailable",
+            failed_count,
+        )
+
+    # ========================================================
+    # AI QUERY
+    # ========================================================
+
+    st.header("🔎 AI Query")
+
+    # ========================================================
+    # GEMINI CLIENT
+    # ========================================================
+
+    client = None
+
+    try:
+
+        gemini_api = st.secrets[
+            "GEMINI_API_KEY"
+        ]
+
+        client = genai.Client(
+            api_key=gemini_api
+        )
+
+    except Exception as e:
+
+        st.warning(
+            "Gemini API key is not configured correctly."
+        )
+
+        st.caption(
+            f"Gemini configuration: {e}"
+        )
+
+    # ========================================================
+    # GEMINI MODELS
+    # ========================================================
+
+    gen_models = []
+
+    if client is not None:
+
+        try:
+
+            for model in client.models.list():
+
+                model_name = getattr(
+                    model,
+                    "name",
+                    "",
+                )
+
+                if model_name:
+
+                    # Keep model names that can be
+                    # used with generate_content.
+                    gen_models.append(
+                        model_name
+                    )
+
+        except Exception as e:
+
+            st.warning(
+                f"Unable to retrieve Gemini models: {e}"
+            )
+
+    # ========================================================
+    # MODEL SELECTION
+    # ========================================================
+
+    selected_model = None
+
+    if gen_models:
+
+        selected_model = st.selectbox(
+            "Choose AI Model",
+            options=gen_models,
+            index=0,
+            key="index_analyzer_model",
+        )
+
+    else:
+
+        st.info(
+            "No Gemini models are currently available."
+        )
+
+    # ========================================================
+    # USER PROMPT
+    # ========================================================
+
+    user_prompt = st.text_area(
+        "Enter your prompt",
+        placeholder=(
+            "Example: Compare Bank Nifty, Nifty IT "
+            "and Nifty Pharma over the selected periods."
+        ),
+        max_chars=1000,
+        key="index_analyzer_prompt",
+    )
+
+    # ========================================================
+    # SUBMIT
+    # ========================================================
+
+    if st.button(
+        "Submit",
+        key="index_analyzer_submit",
+    ):
+
+        if not user_prompt.strip():
+
+            st.error(
+                "Please enter a prompt before submitting."
+            )
+
+        elif client is None:
+
+            st.error(
+                "Gemini client is not available."
+            )
+
+        elif not selected_model:
+
+            st.error(
+                "Please select a Gemini model."
+            )
+
+        else:
+
+            with st.spinner(
+                "Getting AI analysis..."
+            ):
+
+                try:
+
+                    # ----------------------------------------
+                    # Prepare only available data
+                    # ----------------------------------------
+
+                    data_df = (
+                        change_df
+                        .reset_index()
+                        .rename(
+                            columns={
+                                "index":
+                                "Index Name"
+                            }
+                        )
+                    )
+
+                    finance_data_json = (
+                        data_df.to_json(
+                            orient="records"
+                        )
+                    )
+
+                    # ----------------------------------------
+                    # Prompt
+                    # ----------------------------------------
+
+                    final_prompt = f"""
+You are a financial data analyst.
+
+You are given percentage-change data
+for NSE indices.
+
+Data:
+{finance_data_json}
+
+User question:
+{user_prompt}
+
+Instructions:
+
+1. Analyze only the data supplied above.
+2. Identify relevant index movements and trends.
+3. Compare indices where appropriate.
+4. Mention positive and negative movements.
+5. Do not treat NA values as zero.
+6. Do not invent missing market data.
+7. Clearly state when data is unavailable.
+8. Provide a concise financial-data-based conclusion.
+
+This is an analytical summary based on
+historical percentage-change data and should
+not be presented as guaranteed future performance.
+"""
+
+                    # ----------------------------------------
+                    # Generate Gemini response
+                    # ----------------------------------------
+
+                    response = client.models.generate_content(
+                        model=selected_model,
+                        contents=final_prompt,
+                    )
+
+                    response_text = getattr(
+                        response,
+                        "text",
+                        None,
+                    )
+
+                    if response_text:
+
+                        st.session_state.index_analyzer_response = (
+                            response_text
+                        )
+
+                    else:
+
+                        st.session_state.index_analyzer_response = (
+                            "No response was returned by Gemini."
+                        )
+
+                except Exception as e:
+
+                    st.session_state.index_analyzer_response = ""
+
+                    st.error(
+                        f"Gemini analysis failed: {e}"
+                    )
+
+    # ========================================================
+    # AI RESPONSE
+    # ========================================================
+
+    if (
+        st.session_state.index_analyzer_response
+    ):
+
+        with st.expander(
+            "📊 AI Analysis Result",
+            expanded=True,
+        ):
+
+            if selected_model:
+
+                st.markdown(
+                    f"**Model Used:** `{selected_model}`"
+                )
+
+            st.write(
+                st.session_state.index_analyzer_response
+            )
+
+    # ========================================================
+    # CHARTS
+    # ========================================================
+
+    if selected_intervals:
+
+        if len(selected_intervals) == 1:
+
+            plot_single_bar(
+                change_df,
+                selected_intervals[0],
+            )
+
+        else:
+
+            plot_grouped(
+                change_df,
+                selected_intervals,
+            )
+
+    else:
+
+        st.warning(
+            "⚠️ Please select at least one time interval."
+        )
+
+
+# ============================================================
+# STANDALONE EXECUTION
+# ============================================================
+
+if __name__ == "__main__":
+    main()
