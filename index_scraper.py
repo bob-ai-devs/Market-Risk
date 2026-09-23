@@ -21,6 +21,7 @@ import time
 import pandas as pd
 import pytz
 import streamlit as st
+import random
 
 from index_config import CATEGORY_DISPLAY_NAMES, CATEGORY_LABELS, INDEX_NAMES_FETCH, VIEW_LABELS
 from stock_analytics import build_stock_table, extract_flags, text_to_html
@@ -56,10 +57,42 @@ def _init_state():
         "last_selection": None,
         "ai_report_html": "",
         "display_name": None,
+        "dark_rgb": None,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
+
+
+# ========================================================
+# DARK → LIGHT ROW COLORS
+# ========================================================
+
+def row_gradient(df, dark_rgb):
+    n = len(df)
+
+    def get_row_color(row_idx):
+        # 0 = dark, last row = light
+        ratio = row_idx / max(n - 1, 1)
+
+        # Blend dark color with white
+        r = int(dark_rgb[0] + (255 - dark_rgb[0]) * ratio)
+        g = int(dark_rgb[1] + (255 - dark_rgb[1]) * ratio)
+        b = int(dark_rgb[2] + (255 - dark_rgb[2]) * ratio)
+
+        return f"rgb({r}, {g}, {b})"
+
+    styles = pd.DataFrame(
+        "",
+        index=df.index,
+        columns=df.columns
+    )
+
+    for i, idx in enumerate(df.index):
+        color = get_row_color(i)
+        styles.loc[idx, :] = f"background-color: {color}"
+
+    return styles
 
 
 # --------------------------------------------------------------------------
@@ -313,13 +346,33 @@ def main():
         name = _resolve_index_selection(category, display_name)
         st.session_state["last_selection"] = (category, name, view_value, pred_value)
         _run_analysis(category, name, view_value, pred_value)
+        dark_rgb = (
+            random.randint(30, 80),
+            random.randint(30, 80),
+            random.randint(30, 80)
+        )
+        st.session_state.dark_rgb = dark_rgb
 
     # ---- Results --------------------------------------------------------
     final_df = st.session_state["final_df"]
     if not final_df.empty:
         st.subheader(f"Results: {st.session_state.display_name.upper()}")
         st.caption(f"Generated at: {st.session_state['generated_at']} (IST)")
-        st.dataframe(final_df, use_container_width=True, height=520)
+        # ========================================================
+        # DISPLAY
+        # ========================================================
+        
+        styled_df = df.style.apply(
+            lambda x: row_gradient(df, dark_rgb),
+            axis=None
+        )
+        
+        st.dataframe(
+            styled_df,
+            use_container_width=True,
+            # hide_index=True
+        )
+        # st.dataframe(final_df, use_container_width=True, height=520)
 
         dl_col, ai_flag_col = st.columns([1, 3])
         with dl_col:
