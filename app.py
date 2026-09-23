@@ -16,6 +16,37 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+st.markdown(
+    f"""
+    <style>
+    .stApp {{
+        background-color: {BOB_CREAM};
+    }}
+    #bob-banner {{
+        background: radial-gradient(circle at 15% 50%, {BOB_ORANGE} 0%, {BOB_ORANGE_DEEP} 45%, {BOB_MAROON} 100%);
+        padding: 22px 30px;
+        border-radius: 12px;
+        margin-bottom: 22px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }}
+    #bob-banner h1 {{
+        color: white;
+        margin: 0;
+        font-size: 1.9em;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+    }}
+    #bob-banner p {{
+        color: #FFEFE0;
+        margin: 4px 0 0 0;
+        font-size: 0.95em;
+    }}
+    h1, h2, h3 {{ color: {BOB_NAVY}; }}
+        </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 # ============================================================
 # BOB COLORS
@@ -98,9 +129,15 @@ def show_portal():
     # Header
     # --------------------------------------------------------
 
-    st.markdown("## 🏦 Bank of Baroda")
-
-    st.markdown("# AI Index Solutions Hub")
+    st.markdown(
+        """
+        <div id="bob-banner">
+            <h1>🏦 BOB AI Financial Risk Analyzer</h1>
+            <p>AI-assisted fundamental &amp; risk analysis, powered by Gemini + Yahoo Finance</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.caption(
         "AI & Emerging Technologies  •  Intelligent Market Intelligence Solutions"
