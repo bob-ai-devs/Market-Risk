@@ -53,7 +53,12 @@ st.markdown(
         font-size: 0.95em;
     }}
     h1, h2, h3 {{ color: {BOB_NAVY}; }}
-        </style>
+    /* BOB AI Portal Card Border */
+    div[data-testid="stVerticalBlockBorderWrapper"] {{
+        border: 1.5px solid {BOB_ORANGE_DEEP} !important;
+        border-radius: 14px !important;
+    }}
+    </style>
     """,
     unsafe_allow_html=True,
 )
@@ -149,7 +154,6 @@ def show_portal():
         """,
         unsafe_allow_html=True,
     )
-    st.divider()
 
     st.markdown("### Explore AI Applications")
 
