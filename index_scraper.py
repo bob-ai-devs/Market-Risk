@@ -55,6 +55,7 @@ def _init_state():
         "new_red": [],
         "last_selection": None,
         "ai_report_html": "",
+        "display_name": None;
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -296,6 +297,7 @@ def main():
     with col4:
         display_options = CATEGORY_DISPLAY_NAMES[category]
         display_name = st.selectbox("Choose an index", options=display_options)
+        st.session_state.display_name = display_name
 
     col5, col6 = st.columns(2)
     with col5:
@@ -315,7 +317,7 @@ def main():
     # ---- Results --------------------------------------------------------
     final_df = st.session_state["final_df"]
     if not final_df.empty:
-        st.subheader(f"Results: {st.session_state['task_name'].upper()}")
+        st.subheader(f"Results: {st.session_state.display_name.upper()}")
         st.caption(f"Generated at: {st.session_state['generated_at']} (IST)")
         st.dataframe(final_df, use_container_width=True, height=520)
 
