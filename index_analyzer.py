@@ -226,7 +226,7 @@ def main():
     st.markdown(
         """
         <div id="bob-banner">
-            <h1>"📈 NSE Index Analyzer"</h1>
+            <h1>📈 NSE Index Analyzer</h1>
             <p>AI & Emerging Technologies  •  Intelligent Market Intelligence Solutions</p>
         </div>
         """,
