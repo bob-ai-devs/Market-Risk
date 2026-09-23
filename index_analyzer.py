@@ -222,7 +222,16 @@ def main():
         page_icon="📈"
     )
 
-    st.title("📈 NSE Index Analyzer")
+    # st.title("📈 NSE Index Analyzer")
+    st.markdown(
+        """
+        <div id="bob-banner">
+            <h1>"📈 NSE Index Analyzer"</h1>
+            <p>AI & Emerging Technologies  •  Intelligent Market Intelligence Solutions</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     
     selected_intervals = st.multiselect(
         "Select time periods to display:",
