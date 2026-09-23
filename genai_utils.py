@@ -19,16 +19,17 @@ def get_client(api_key: str) -> genai.Client:
 
 def list_model_names(client: genai.Client):
     """Return a sorted list of model names usable with generate_content."""
-    names = []
-    try:
-        for model in client.models.list():
-            # Only keep models that support text generation.
-            actions = getattr(model, "supported_actions", None)
-            if actions is None or "generateContent" in actions:
-                names.append(model.name.split("/")[-1])
-    except Exception:
-        pass
-    return sorted(set(names))
+    # names = []
+    # try:
+    #     for model in client.models.list():
+    #         # Only keep models that support text generation.
+    #         actions = getattr(model, "supported_actions", None)
+    #         if actions is None or "generateContent" in actions:
+    #             names.append(model.name.split("/")[-1])
+    # except Exception:
+    #     pass
+    # return sorted(set(names))
+    return ['gemini-flash-lite-latest', 'gemini-flash-latest']
 
 
 def generate_text(client: genai.Client, prompt: str, model: str = "") -> str:
