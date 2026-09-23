@@ -3,7 +3,7 @@ import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
-import google.generativeai as genai
+from google import genai
 import json
 import numpy as np
 
