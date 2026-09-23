@@ -125,14 +125,14 @@ def fetch_change_data():
     return pd.DataFrame(results).T.astype("float")
 
 
-if "response" not in st.session_state:
-    st.session_state.response = ""
+if "analyzer_response" not in st.session_state:
+    st.session_state.analyzer_response = ""
 
 # Load NSE data only once per session
 if "change_df" not in st.session_state:
     with st.spinner("Fetching NSE index data..."):
         st.session_state.change_df = fetch_change_data()
-        st.session_state.response = ""
+        st.session_state.analyzer_response = ""
 
 # change_df = st.session_state.change_df
 
@@ -333,24 +333,24 @@ def main():
                     )
 
                     if response_text: 
-                        st.session_state.response = response_text 
+                        st.session_state.analyzer_response = response_text 
                     else: 
-                        st.session_state.response = (
+                        st.session_state.analyzer_response = (
                             "No response was returned by Gemini."
                         )
 
                 except Exception as e: 
-                    st.session_state.response = "" 
+                    st.session_state.analyzer_response = "" 
                     st.error(
                         f"Gemini analysis failed: {e}"
                     )
     
-    if st.session_state.response:
+    if st.session_state.analyzer_response:
         with st.expander("📊 AI Analysis Result"):
             st.markdown(
                 f"**Model Used:** `{selected_model}`"
             )
-            st.write(st.session_state.response)
+            st.write(st.session_state.analyzer_response)
     
     # Show plots
     if selected_intervals:
