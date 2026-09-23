@@ -362,8 +362,8 @@ def main():
         # DISPLAY
         # ========================================================
         
-        styled_df = df.style.apply(
-            lambda x: row_gradient(df, dark_rgb),
+        styled_df = final_df.style.apply(
+            lambda x: row_gradient(final_df, st.session_state.dark_rgb),
             axis=None
         )
         
