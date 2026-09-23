@@ -491,11 +491,11 @@ def main():
     #                         model_name
     #                     )
 
-        except Exception as e:
+    #     except Exception as e:
 
-            st.warning(
-                f"Unable to retrieve Gemini models: {e}"
-            )
+    #         st.warning(
+    #             f"Unable to retrieve Gemini models: {e}"
+    #         )
 
     # --------------------------------------------------------
     # MODEL SELECTION
