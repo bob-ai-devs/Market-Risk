@@ -55,7 +55,7 @@ def _init_state():
         "new_red": [],
         "last_selection": None,
         "ai_report_html": "",
-        "display_name": None;
+        "display_name": "";
     }
     for key, value in defaults.items():
         if key not in st.session_state:
