@@ -213,114 +213,37 @@ def fetch_change_data():
     ).T.astype(float)
 
 
-# ============================================================
-# SINGLE INTERVAL BAR CHART
-# ============================================================
+# Single interval bar plot
+def plot_single_bar(df, interval):
+    st.subheader(f"📊 NSE Index % Change: {interval}")
+    df_sorted = df[[interval]].dropna().sort_values(interval, ascending=False)
+    fig = go.Figure(go.Bar(
+        x=df_sorted.index,
+        y=df_sorted[interval],
+        text=[f"{v:.2f}%" for v in df_sorted[interval]],
+        textposition="auto",
+        marker_color="royalblue"
+    ))
+    fig.update_layout(yaxis_title="% Change", xaxis_title="Index", xaxis_tickangle=-45)
+    st.plotly_chart(fig, use_container_width=True)
 
-def plot_single_bar(
-    df: pd.DataFrame,
-    interval: str,
-):
-
-    st.subheader(
-        f"📊 NSE Index % Change: {interval}"
-    )
-
-    df_sorted = (
-        df[[interval]]
-        .dropna()
-        .sort_values(
-            interval,
-            ascending=False,
-        )
-    )
-
-    fig = go.Figure(
-        go.Bar(
-            x=df_sorted.index,
-            y=df_sorted[interval],
-            text=[
-                f"{v:.2f}%"
-                for v in df_sorted[interval]
-            ],
-            textposition="auto",
-            marker_color="royalblue",
-        )
-    )
-
-    fig.update_layout(
-        yaxis_title="% Change",
-        xaxis_title="Index",
-        xaxis_tickangle=-45,
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-    )
-
-
-# ============================================================
-# MULTIPLE INTERVAL GROUPED BAR CHART
-# ============================================================
-
-def plot_grouped(
-    df: pd.DataFrame,
-    intervals: list,
-):
-
-    st.subheader(
-        "📊 Grouped Index % Changes"
-    )
-
-    df_sorted = (
-        df[intervals]
-        .dropna()
-        .sort_values(
-            intervals[0],
-            ascending=False,
-        )
-    )
-
-    colors = [
-        "#1f77b4",
-        "#ff7f0e",
-        "#2ca02c",
-        "#d62728",
-        "#9467bd",
-    ]
-
+# Multiple interval grouped bar plot
+def plot_grouped(df, intervals):
+    st.subheader("📊 Grouped Index % Changes")
+    df_sorted = df[intervals].dropna().sort_values(intervals[0], ascending=False)
     fig = go.Figure()
-
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
     for i, label in enumerate(intervals):
-
-        fig.add_trace(
-            go.Bar(
-                x=df_sorted.index,
-                y=df_sorted[label],
-                name=label,
-                marker_color=colors[
-                    i % len(colors)
-                ],
-                text=[
-                    f"{v:.2f}%"
-                    for v in df_sorted[label]
-                ],
-                textposition="auto",
-            )
-        )
-
-    fig.update_layout(
-        barmode="group",
-        yaxis_title="% Change",
-        xaxis_title="Index",
-        xaxis_tickangle=-45,
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-    )
+        fig.add_trace(go.Bar(
+            x=df_sorted.index,
+            y=df_sorted[label],
+            name=label,
+            marker_color=colors[i % len(colors)],
+            text=[f"{v:.2f}%" for v in df_sorted[label]],
+            textposition="auto"
+        ))
+    fig.update_layout(barmode="group", yaxis_title="% Change", xaxis_title="Index", xaxis_tickangle=-45)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 # ============================================================
