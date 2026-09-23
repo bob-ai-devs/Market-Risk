@@ -1,8 +1,8 @@
 import streamlit as st
 
-from financial_risk import main as financial_risk_main
-from esg import main as esg_main
-from multilingual import main as multilingual_main
+# from financial_risk import main as financial_risk_main
+# from esg import main as esg_main
+# from multilingual import main as multilingual_main
 
 
 # ============================================================
