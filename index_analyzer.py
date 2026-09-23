@@ -227,7 +227,7 @@ def main():
         """
         <div id="bob-banner">
             <h1>📈 NSE Index Analyzer</h1>
-            <p>AI & Emerging Technologies  •  Intelligent Market Intelligence Solutions</p>
+            <p>Core index insights  •  Index trend analysis</p>
         </div>
         """,
         unsafe_allow_html=True,
