@@ -456,38 +456,40 @@ def main():
     # GET AVAILABLE GEMINI MODELS
     # --------------------------------------------------------
 
-    gen_models = []
+    # gen_models = []
 
-    if client is not None:
+    gen_models = ['gemini-flash-lite-latest', 'gemini-flash-lite']
 
-        try:
+    # if client is not None:
 
-            for model in client.models.list():
+    #     try:
 
-                model_name = getattr(
-                    model,
-                    "name",
-                    "",
-                )
+    #         for model in client.models.list():
 
-                # Keep only models that support
-                # generateContent
-                actions = getattr(
-                    model,
-                    "supported_actions",
-                    [],
-                )
+    #             model_name = getattr(
+    #                 model,
+    #                 "name",
+    #                 "",
+    #             )
 
-                if (
-                    "generateContent" in actions
-                    or not actions
-                ):
+    #             # Keep only models that support
+    #             # generateContent
+    #             actions = getattr(
+    #                 model,
+    #                 "supported_actions",
+    #                 [],
+    #             )
 
-                    if model_name:
+    #             if (
+    #                 "generateContent" in actions
+    #                 or not actions
+    #             ):
 
-                        gen_models.append(
-                            model_name
-                        )
+    #                 if model_name:
+
+    #                     gen_models.append(
+    #                         model_name
+    #                     )
 
         except Exception as e:
 
