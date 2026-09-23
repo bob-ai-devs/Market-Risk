@@ -143,17 +143,12 @@ def show_portal():
     st.markdown(
         """
         <div id="bob-banner">
-            <h1>🏦 BOB AI Financial Risk Analyzer</h1>
-            <p>AI-assisted fundamental &amp; risk analysis, powered by Gemini + Yahoo Finance</p>
+            <h1>🏦 BOB AI Index Solutions Hub</h1>
+            <p>AI & Emerging Technologies  •  Intelligent Market Intelligence Solutions</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-    st.caption(
-        "AI & Emerging Technologies  •  Intelligent Market Intelligence Solutions"
-    )
-
     st.divider()
 
     st.markdown("### Explore AI Applications")
