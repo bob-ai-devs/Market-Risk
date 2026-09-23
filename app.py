@@ -1,8 +1,8 @@
 import streamlit as st
 
-# from financial_risk import main as financial_risk_main
-# from esg import main as esg_main
-# from multilingual import main as multilingual_main
+from financial_risk import main as financial_risk_main
+from esg import main as esg_main
+from multilingual import main as multilingual_main
 
 
 # ============================================================
@@ -10,7 +10,7 @@ import streamlit as st
 # ============================================================
 
 st.set_page_config(
-    page_title="BOB AI Solutions Hub",
+    page_title="BOB AI Index Solutions Hub",
     page_icon="🏦",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -44,45 +44,45 @@ APPLICATIONS = [
         "id": "financial",
         "number": "01",
         "icon": "📊",
-        "title": "AI Financial Risk",
+        "title": "Index Scrapper",
         "description": (
-            "AI-powered financial risk and reputation analysis combining "
-            "financial indicators, market information and news intelligence."
+            "Generate stock, company and ETF-wise insights by analyzing "
+            "market data, financial information and relevant market signals."
         ),
         "features": [
-            "Financial risk indicators",
+            "Stock-wise insights",
+            "Company & ETF analysis",
             "Market intelligence",
-            "News & reputation analysis",
         ],
     },
     {
         "id": "esg",
         "number": "02",
-        "icon": "🌱",
-        "title": "AI ESG Analytics",
+        "icon": "📈",
+        "title": "Index Analyzer",
         "description": (
-            "AI-powered Environmental, Social and Governance analytics "
-            "using news intelligence, sentiment analysis and ESG scoring."
+            "Analyze core market indices and generate insights on indices "
+            "such as Bank Nifty, Nifty Media and other major market segments."
         ),
         "features": [
-            "Environmental, Social & Governance scoring",
-            "News intelligence",
-            "ESG trends & monitoring",
+            "Core index insights",
+            "Bank Nifty & sector indices",
+            "Index trend analysis",
         ],
     },
     {
         "id": "multilingual",
         "number": "03",
-        "icon": "🌐",
-        "title": "AI Multilingual Assistant",
+        "icon": "🔮",
+        "title": "Index Predictor",
         "description": (
-            "Intelligent multilingual banking assistance with speech "
-            "recognition, translation and AI-powered product interaction."
+            "AI-powered prediction of future Nifty 50 index movement using "
+            "historical market data and relevant market signals."
         ),
         "features": [
-            "Speech recognition",
-            "Multilingual translation",
-            "Banking product assistance",
+            "Nifty 50 prediction",
+            "Future index movement",
+            "AI-powered market signals",
         ],
     },
 ]
@@ -100,27 +100,31 @@ def show_portal():
 
     st.markdown("## 🏦 Bank of Baroda")
 
-    st.markdown(
-        f"# AI Solutions Hub"
-    )
+    st.markdown("# AI Index Solutions Hub")
 
     st.caption(
-        "AI & Emerging Technologies  •  Intelligent Banking Solutions"
+        "AI & Emerging Technologies  •  Intelligent Market Intelligence Solutions"
     )
 
     st.divider()
 
     st.markdown("### Explore AI Applications")
-    st.caption("Select an application below to launch the solution.")
+
+    st.caption(
+        "Select an application below to launch the solution."
+    )
 
     st.write("")
 
 
     # --------------------------------------------------------
-    # Cards
+    # Application Cards
     # --------------------------------------------------------
 
-    col1, col2, col3 = st.columns(3, gap="large")
+    col1, col2, col3 = st.columns(
+        3,
+        gap="large"
+    )
 
     columns = [col1, col2, col3]
 
@@ -128,10 +132,13 @@ def show_portal():
 
         with col:
 
-            # Native Streamlit card
+            # ------------------------------------------------
+            # Native Streamlit Card
+            # ------------------------------------------------
+
             with st.container(border=True):
 
-                # Application number
+                # Application number and availability
                 st.caption(
                     f"APPLICATION {app['number']}  •  🟢 AVAILABLE"
                 )
@@ -153,11 +160,13 @@ def show_portal():
 
                 st.write("")
 
-                # Capabilities
+                # Key capabilities
                 st.markdown("**Key capabilities**")
 
                 for feature in app["features"]:
-                    st.write(f"• {feature}")
+                    st.write(
+                        f"• {feature}"
+                    )
 
                 st.write("")
 
@@ -176,6 +185,7 @@ def show_portal():
     # --------------------------------------------------------
 
     st.write("")
+
     st.divider()
 
     st.caption(
@@ -191,9 +201,12 @@ def run_selected_application():
 
     selected_app = st.session_state.selected_app
 
-    # Back button
+    # --------------------------------------------------------
+    # Back Button
+    # --------------------------------------------------------
+
     if st.button(
-        "← Back to AI Solutions Hub",
+        "← Back to AI Index Solutions Hub",
         key="back_to_portal",
     ):
         st.session_state.selected_app = None
@@ -201,7 +214,11 @@ def run_selected_application():
 
     st.divider()
 
-    # Run selected application
+
+    # --------------------------------------------------------
+    # Launch Selected Application
+    # --------------------------------------------------------
+
     if selected_app == "financial":
 
         financial_risk_main()
