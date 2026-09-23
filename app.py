@@ -1,6 +1,6 @@
 import streamlit as st
 
-from index_analyzer import main as analyzer_main()
+from index_analyzer import main as analyzer_main
 
 # ============================================================
 # PAGE CONFIG
