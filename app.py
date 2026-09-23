@@ -184,7 +184,10 @@ def show_portal():
 
                 # Application number and availability
                 st.caption(
-                    f"APPLICATION {app['number']}  •  🟢 AVAILABLE"
+                    if col == col2:
+                        f"APPLICATION {app['number']}  •  🟢 AVAILABLE"
+                    else:
+                        f"APPLICATION {app['number']}  •  🔴 UNAVAILABLE"
                 )
 
                 # Icon
