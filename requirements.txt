@@ -8,5 +8,5 @@ matplotlib>=3.8
 seaborn>=0.13
 plotly>=5.22
 scipy>=1.11
-google-genai
-yfinance
+google-genai>=0.3.0
+yfinance>=0.2.40
