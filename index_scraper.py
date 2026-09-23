@@ -241,8 +241,14 @@ def main():
 
     _init_state()
 
-    st.title("📈 StockAlert")
-    st.caption("Moving-average, momentum and AI-driven stock screening — Streamlit edition.")
+    st.markdown(
+        """
+        <div id="bob-banner">
+            <h1>📈 NSE Index Analyzer</h1>
+            <p>Moving-average, momentum and AI-driven stock screening</p>
+        </div>
+        """, unsafe_allow_html=True
+    )
 
     api_key = _api_key()
     if not api_key:
