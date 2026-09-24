@@ -349,7 +349,7 @@ def main():
 
     col5, col6 = st.columns(2)
     with col5:
-        ai_flagging = st.radio("AI Flagging", ["Not Needed", "Needed"], horizontal=True)
+        ai_flagging = st.radio("AI Continuous Flagging", ["Not Needed", "Needed"], horizontal=True)
     with col6:
         model_names = _cached_model_names(api_key) if api_key else []
         # model_name = st.selectbox("AI model", options=["Default Model"] + model_names)
