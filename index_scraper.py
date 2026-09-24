@@ -76,9 +76,12 @@ def row_gradient(df, dark_rgb):
         ratio = row_idx / max(n - 1, 1)
 
         # Blend dark color with white
-        r = int(dark_rgb[0] - (255 - dark_rgb[0]) * ratio)
-        g = int(dark_rgb[1] - (255 - dark_rgb[1]) * ratio)
-        b = int(dark_rgb[2] - (255 - dark_rgb[2]) * ratio)
+        # r = int(dark_rgb[0] - (255 - dark_rgb[0]) * ratio)
+        # g = int(dark_rgb[1] - (255 - dark_rgb[1]) * ratio)
+        # b = int(dark_rgb[2] - (255 - dark_rgb[2]) * ratio)
+        r = int(dark_rgb[0] - dark_rgb[0] * ratio)
+        g = int(dark_rgb[1] - dark_rgb[1] * ratio)
+        b = int(dark_rgb[2] - dark_rgb[2] * ratio)
 
         return f"rgb({r}, {g}, {b})"
 
