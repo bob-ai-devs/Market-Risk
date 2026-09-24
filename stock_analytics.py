@@ -103,16 +103,15 @@ def get_stock_data(ticker: str):
             return None
         for window in (20, 50, 100, 200, 400, 600):
             data[f"{window}DMA"] = data["Close"].rolling(window=window).mean()
-        data["inav"] = stock.info.get("regularMarketPrice").values()
-        return data
+        inav = stock.info.get("regularMarketPrice")
+        return data, inav
     except Exception:
         return None
 
 
-def create_stock_dataframe(ticker: str, data: pd.DataFrame) -> pd.DataFrame:
+def create_stock_dataframe(ticker: str, data: pd.DataFrame, inav: str) -> pd.DataFrame:
     last_row = data.iloc[-1]
     current_price = last_row["Close"]
-    inav = data["inav"]
 
     def pct_vs_dma(dma_col):
         dma = last_row[dma_col]
@@ -141,14 +140,14 @@ def create_stock_dataframe(ticker: str, data: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(stock_data)
 
 
-def create_stock_dataframe_momentum(ticker: str, data: pd.DataFrame = None) -> pd.DataFrame:
+def create_stock_dataframe_momentum(ticker: str, data: pd.DataFrame = None, inav: str) -> pd.DataFrame:
     """
     Volume-weighted rate-of-change ("momentum") table.
     Accepts pre-fetched `data` (from get_stock_data) to avoid a second
     network round-trip per ticker; falls back to fetching it itself.
     """
     if data is None:
-        data = get_stock_data(ticker)
+        data, inav = get_stock_data(ticker)
     if data is None or data.empty:
         raise ValueError(f"No data for {ticker}")
 
@@ -174,6 +173,7 @@ def create_stock_dataframe_momentum(ticker: str, data: pd.DataFrame = None) -> p
         "Company Name": [""],
         "Ticker": [display_ticker],
         "Current Price": [round(current_price, 2)],
+        "iNAV": [round(inav, 2)],
         "1DMoM": [roc_values[1]],
         "5DMoM": [roc_values[5]],
         "10DMoM": [roc_values[10]],
@@ -297,7 +297,7 @@ def build_stock_table(
 
         ticker = f"{symbol}.NS" if use_ns_suffix else symbol
 
-        data = get_stock_data(ticker)
+        data, inav = get_stock_data(ticker)
         if data is None or data.empty:
             if progress_callback:
                 progress_callback(i + 1, total, time.time() - start_time)
@@ -305,11 +305,11 @@ def build_stock_table(
 
         try:
             if view_value == "momentum":
-                stock_df = create_stock_dataframe_momentum(ticker, data)
+                stock_df = create_stock_dataframe_momentum(ticker, data, inav)
             else:
-                stock_df = create_stock_dataframe(ticker, data)
+                stock_df = create_stock_dataframe(ticker, data, inav)
                 if view_value == "consolidated":
-                    temp_df = create_stock_dataframe_momentum(ticker, data)
+                    temp_df = create_stock_dataframe_momentum(ticker, data, inav)
                     stock_df = stock_df.drop(columns=["Volume"])
                     temp_df = temp_df.drop(columns=["Company Name", "Current Price"])
                     stock_df = pd.concat(
