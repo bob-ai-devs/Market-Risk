@@ -120,6 +120,89 @@ def text_to_html(text: str) -> str:
     text = html_lib.unescape(text)
 
     # ============================================================
+    # 1b. PROTECT GENUINE BLOCK-LEVEL HTML VERBATIM
+    # ============================================================
+    # Gemini sometimes hands back ALREADY-FORMED block HTML — a full
+    # <table>...</table> with <thead>/<tbody>/<tr>/<td>, a real <ul>
+    # with <li> children, a <blockquote>, a <pre> block, etc. — mixed in
+    # with plain Markdown elsewhere in the same response. None of that
+    # matches our line-by-line Markdown parser below, so without this
+    # step it would fall through to the "plain paragraph" branch and
+    # get HTML-escaped into visible tag soup.
+    #
+    # This pass finds any of those block containers (correctly handling
+    # same-tag nesting, e.g. a <div> inside a <div>) and swaps the WHOLE
+    # block for a placeholder token, so it is carried through untouched
+    # and reinserted verbatim into the final HTML at the very end.
+
+    protected_html = {}
+
+    def _protect(raw_html, prefix):
+        key = f"X{prefix}X{len(protected_html)}X"
+        protected_html[key] = raw_html
+        return key
+
+    _BLOCK_TAGS = ("table", "ul", "ol", "blockquote", "pre", "dl")
+
+    def _protect_block_html(raw_text):
+        tag_pattern = re.compile(
+            r"<(" + "|".join(_BLOCK_TAGS) + r")\b[^>]*>",
+            re.IGNORECASE,
+        )
+        pieces = []
+        pos = 0
+        while True:
+            m = tag_pattern.search(raw_text, pos)
+            if not m:
+                pieces.append(raw_text[pos:])
+                break
+            tag_name = m.group(1).lower()
+            start = m.start()
+            open_re = re.compile(rf"<{tag_name}\b[^>]*>", re.IGNORECASE)
+            close_re = re.compile(rf"</{tag_name}\s*>", re.IGNORECASE)
+            depth = 1
+            cursor = m.end()
+            end = len(raw_text)
+            while cursor < len(raw_text):
+                next_open = open_re.search(raw_text, cursor)
+                next_close = close_re.search(raw_text, cursor)
+                if not next_close:
+                    end = len(raw_text)
+                    break
+                if next_open and next_open.start() < next_close.start():
+                    depth += 1
+                    cursor = next_open.end()
+                else:
+                    depth -= 1
+                    cursor = next_close.end()
+                    if depth == 0:
+                        end = next_close.end()
+                        break
+            block_text = raw_text[start:end]
+            pieces.append(raw_text[pos:start])
+            pieces.append(_protect(block_text, "GEMBLOCK"))
+            pos = end
+        return "".join(pieces)
+
+    text = _protect_block_html(text)
+
+    # Real <h1>-<h6> tags (as opposed to our own "#" Markdown) get
+    # converted into "# " Markdown syntax so they flow through our own
+    # heading parser and pick up consistent styling. Inner inline tags
+    # (e.g. a <b> inside the heading) are preserved and protected later.
+    def _convert_real_headings(match):
+        level = int(match.group(1))
+        inner = match.group(2).strip()
+        return "\n" + ("#" * level) + " " + inner + "\n"
+
+    text = re.sub(
+        r"<h([1-6])\b[^>]*>(.*?)</h\1\s*>",
+        _convert_real_headings,
+        text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+
+    # ============================================================
     # 2. REMOVE UNWANTED GEMINI WRAPPER HTML
     # ============================================================
 
@@ -132,9 +215,10 @@ def text_to_html(text: str) -> str:
     # Convert <br>, <br/>, <br /> to newline
     text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
 
-    # Convert <div>/<ul>/<ol>/<li>/<h1-6> wrappers Gemini sometimes emits
-    # into plain newlines too, so they don't collide with our own parser.
-    text = re.sub(r"</?(?:div|ul|ol|li|h[1-6])\b[^>]*>", "\n", text, flags=re.IGNORECASE)
+    # <div> is used by Gemini purely as a generic paragraph wrapper
+    # (table/ul/ol/blockquote/pre were already pulled out and protected
+    # verbatim above, so this won't touch those).
+    text = re.sub(r"</?div\b[^>]*>", "\n", text, flags=re.IGNORECASE)
 
     # Gemini frequently wraps EACH table row in its own <p>...</p>, e.g.
     #   \<p>| Metric | Top | Lagging |</p>
@@ -181,22 +265,22 @@ def text_to_html(text: str) -> str:
     # italic regexes below (__text__, _text_) would partially match and
     # corrupt those underscore-heavy tokens before they could be restored,
     # leaving stray "INLINE0"-style fragments in the output.
-    protected_html = {}
+    # (protected_html / _protect were already set up in step 1b above,
+    # and are reused here for inline tags too.)
 
-    def protect_html(match):
-        key = f"XGEMHTMLTAGX{len(protected_html)}X"
-        protected_html[key] = match.group(0)
-        return key
-
-    # Preserve:
-    # <b>...</b>  <strong>...</strong>  <i>...</i>  <em>...</em>
-    # <u>...</u>  <mark>...</mark>  <span style="...">...</span>
-
+    # Paired inline tags, any attributes (href, style, class, etc.) —
+    # not just the "style=" case the original version special-cased.
     text = re.sub(
-        r"</?(?:b|strong|i|em|u|mark|span)"
-        r"(?:\s+style\s*=\s*(['\"])[\s\S]*?\1)?"
-        r"\s*/?>",
-        protect_html,
+        r"</?(?:b|strong|i|em|u|s|del|mark|span|a|code|small|sub|sup)\b[^>]*>",
+        lambda mo: _protect(mo.group(0), "GEMHTMLTAGX"),
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    # Void/self-closing inline elements.
+    text = re.sub(
+        r"<(?:img|hr)\b[^>]*/?>",
+        lambda mo: _protect(mo.group(0), "GEMHTMLTAGX"),
         text,
         flags=re.IGNORECASE,
     )
@@ -436,6 +520,17 @@ def text_to_html(text: str) -> str:
             continue
 
         # ========================================================
+        # PROTECTED BLOCK-LEVEL HTML (already-formed <table>, <ul>,
+        # <ol>, <blockquote>, <pre>, <dl> from Gemini) — output it
+        # verbatim, not wrapped in a paragraph <div>.
+        # ========================================================
+        if re.match(r"^XGEMBLOCKX\d+X$", stripped):
+            close_lists()
+            output.append(inline_markdown(stripped))
+            i += 1
+            continue
+
+        # ========================================================
         # TABLE
         # ========================================================
         if (
@@ -666,8 +761,6 @@ def _minify_preserve_pre(html: str) -> str:
         protected = protected.replace(key, block)
 
     return protected
-
-
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
