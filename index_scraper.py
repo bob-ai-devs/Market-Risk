@@ -67,29 +67,29 @@ def _init_state():
 # ========================================================
 # DARK → LIGHT ROW COLORS
 # ========================================================
-
 def row_gradient(df, bright_rgb):
     n = len(df)
     max_idx = max(n - 1, 1)
-    
-    # 1. Create a dark version of your bright color for the starting row (e.g., 20% brightness)
-    dark_start = [int(channel * 0.2) for channel in bright_rgb]
-    
+
+    # Darker starting version while preserving the actual hue
+    dark_start = [max(40, int(channel * 0.45)) for channel in bright_rgb]
+
     def get_row_color(row_idx):
         ratio = row_idx / max_idx
-        
-        # 2. Interpolate from the calculated dark color to pure white (255)
+
+        # Interpolate from dark color → light color
         r = int(dark_start[0] + (255 - dark_start[0]) * ratio)
         g = int(dark_start[1] + (255 - dark_start[1]) * ratio)
         b = int(dark_start[2] + (255 - dark_start[2]) * ratio)
-        
+
         return f"rgb({r}, {g}, {b})"
-    
+
     styles = pd.DataFrame("", index=df.index, columns=df.columns)
+
     for i, idx in enumerate(df.index):
         color = get_row_color(i)
         styles.loc[idx, :] = f"background-color: {color}"
-        
+
     return styles
 
 
@@ -346,11 +346,42 @@ def main():
         name = _resolve_index_selection(category, display_name)
         st.session_state["last_selection"] = (category, name, view_value, pred_value)
         _run_analysis(category, name, view_value, pred_value)
-        dark_rgb = (
-            random.randint(180, 240),
-            random.randint(180, 240),
-            random.randint(180, 240)
-        )
+        # Generate a strong red / green / blue / mixed color
+        color_type = random.choice([
+            "red",
+            "green",
+            "blue",
+            "mixed"
+        ])
+        
+        if color_type == "red":
+            dark_rgb = (
+                random.randint(180, 240),
+                random.randint(40, 100),
+                random.randint(40, 100)
+            )
+        
+        elif color_type == "green":
+            dark_rgb = (
+                random.randint(40, 100),
+                random.randint(180, 240),
+                random.randint(40, 100)
+            )
+        
+        elif color_type == "blue":
+            dark_rgb = (
+                random.randint(40, 100),
+                random.randint(40, 100),
+                random.randint(180, 240)
+            )
+        
+        else:  # mixed
+            dark_rgb = (
+                random.randint(80, 220),
+                random.randint(80, 220),
+                random.randint(80, 220)
+            )
+        
         st.session_state.dark_rgb = dark_rgb
 
     # ---- Results --------------------------------------------------------
