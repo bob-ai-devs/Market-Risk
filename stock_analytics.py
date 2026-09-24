@@ -41,9 +41,13 @@ def safe_pct_change(new, old):
         return 0
 
 
+import re
+import html as html_lib
+
+
 def text_to_html(text: str) -> str:
     """
-    Robust Gemini Markdown/HTML renderer.
+    Robust Gemini Markdown/HTML renderer for Streamlit's st.markdown().
 
     Handles:
         - Normal Markdown
@@ -54,14 +58,28 @@ def text_to_html(text: str) -> str:
         - *italic*
         - ***bold italic***
         - `inline code`
+        - fenced ```code``` blocks
         - bullet lists
         - numbered lists
         - blockquotes
         - horizontal rules
         - Markdown tables
         - Markdown links
-        - Gemini <b> and <span> formatting
+        - Gemini <b> / <span> / <strong> / <em> / <mark> formatting
         - Mixed Markdown + HTML
+
+    IMPORTANT — why this version actually renders in Streamlit:
+    st.markdown() runs everything through a CommonMark parser even with
+    unsafe_allow_html=True. CommonMark treats any line indented 4+ spaces
+    as a literal "indented code block" and prints it as raw text instead
+    of interpreting it as HTML. The original version built every element
+    with deeply indented triple-quoted f-strings, so chunks of the output
+    got swallowed into code blocks or broke the layout.
+
+    This version collapses/strips all structural whitespace out of the
+    final HTML (while fully preserving whitespace *inside* <pre><code>
+    blocks) right before returning, so nothing in the output can ever be
+    reinterpreted as an indented code block.
     """
 
     if not text:
@@ -93,27 +111,50 @@ def text_to_html(text: str) -> str:
     # If Gemini already generated <p style='margin:4px 0'>
     # we don't want nested paragraph tags inside our renderer.
 
-    text = re.sub(
-        r"<p\b[^>]*>",
-        "",
-        text,
-        flags=re.IGNORECASE
-    )
-
-    text = re.sub(
-        r"</p>",
-        "\n",
-        text,
-        flags=re.IGNORECASE
-    )
+    text = re.sub(r"<p\b[^>]*>", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"</p>", "\n", text, flags=re.IGNORECASE)
 
     # Convert <br>, <br/>, <br /> to newline
-    text = re.sub(
-        r"<br\s*/?>",
-        "\n",
-        text,
-        flags=re.IGNORECASE
-    )
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
+
+    # Convert <div>/<ul>/<ol>/<li>/<h1-6> wrappers Gemini sometimes emits
+    # into plain newlines too, so they don't collide with our own parser.
+    text = re.sub(r"</?(?:div|ul|ol|li|h[1-6])\b[^>]*>", "\n", text, flags=re.IGNORECASE)
+
+    # Gemini frequently wraps EACH table row in its own <p>...</p>, e.g.
+    #   \<p>| Metric | Top | Lagging |</p>
+    #
+    #   \<p>| :--- | :--- | :--- |</p>
+    #
+    #   | **Primary Stock** | AAPL | XOM |
+    # Once those <p> tags become newlines (above), the header and the
+    # separator row end up with a blank line between them, which breaks
+    # table detection (it requires them on consecutive lines). Collapse
+    # any blank line(s) that sit between two pipe-containing rows.
+    def _collapse_table_blank_lines(raw_text):
+        src_lines = raw_text.split("\n")
+        out_lines = []
+        idx = 0
+        while idx < len(src_lines):
+            line = src_lines[idx]
+            out_lines.append(line)
+            if "|" in line.strip():
+                look = idx + 1
+                blanks = 0
+                while look < len(src_lines) and not src_lines[look].strip():
+                    blanks += 1
+                    look += 1
+                if (
+                    blanks > 0
+                    and look < len(src_lines)
+                    and "|" in src_lines[look].strip()
+                ):
+                    idx = look
+                    continue
+            idx += 1
+        return "\n".join(out_lines)
+
+    text = _collapse_table_blank_lines(text)
 
     # ============================================================
     # 3. PROTECT INTENTIONAL GEMINI INLINE HTML
@@ -127,12 +168,8 @@ def text_to_html(text: str) -> str:
         return key
 
     # Preserve:
-    # <b>...</b>
-    # <strong>...</strong>
-    # <i>...</i>
-    # <em>...</em>
-    # <span style="...">...</span>
-    # <mark>...</mark>
+    # <b>...</b>  <strong>...</strong>  <i>...</i>  <em>...</em>
+    # <u>...</u>  <mark>...</mark>  <span style="...">...</span>
 
     text = re.sub(
         r"</?(?:b|strong|i|em|u|mark|span)"
@@ -140,7 +177,7 @@ def text_to_html(text: str) -> str:
         r"\s*/?>",
         protect_html,
         text,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
 
     # ============================================================
@@ -160,349 +197,174 @@ def text_to_html(text: str) -> str:
         # Escape everything else
         value = html_lib.escape(value)
 
+        # Restore placeholders' angle-bracket-safe form (escape() would
+        # have mangled anything not already swapped out — nothing to do
+        # here since placeholders are plain alnum/underscore text).
+
         # --------------------------------------------------------
         # Markdown links
         # --------------------------------------------------------
-
         value = re.sub(
             r'\[([^\]]+)\]\((https?://[^\s\)]+)\)',
-            r'<a href="\2" target="_blank" '
-            r'style="'
-            r'color:#0059b3;'
-            r'text-decoration:none;'
-            r'font-weight:600;'
-            r'">'
+            r'<a href="\2" target="_blank" rel="noopener noreferrer" '
+            r'style="color:#0059b3;text-decoration:none;font-weight:600;">'
             r'\1</a>',
-            value
+            value,
         )
 
         # --------------------------------------------------------
         # Inline code
         # --------------------------------------------------------
-
         value = re.sub(
             r'`([^`]+)`',
-            r'<code style="'
-            r'background:#f1f3f5;'
-            r'color:#7a1f1f;'
-            r'padding:2px 6px;'
-            r'border-radius:5px;'
-            r'font-family:Consolas,monospace;'
-            r'font-size:0.90em;'
-            r'">\1</code>',
-            value
+            r'<code style="background:#f1f3f5;color:#7a1f1f;padding:2px 6px;'
+            r'border-radius:5px;font-family:Consolas,monospace;font-size:0.90em;">'
+            r'\1</code>',
+            value,
         )
 
         # --------------------------------------------------------
-        # Bold + italic
+        # Bold + italic (order matters: *** before ** before *)
         # --------------------------------------------------------
-
-        value = re.sub(
-            r'\*\*\*(.+?)\*\*\*',
-            r'<strong><em>\1</em></strong>',
-            value
-        )
-
-        # --------------------------------------------------------
-        # Bold
-        # --------------------------------------------------------
-
-        value = re.sub(
-            r'\*\*(.+?)\*\*',
-            r'<strong>\1</strong>',
-            value
-        )
-
-        value = re.sub(
-            r'__(.+?)__',
-            r'<strong>\1</strong>',
-            value
-        )
-
-        # --------------------------------------------------------
-        # Italic
-        # --------------------------------------------------------
-
-        value = re.sub(
-            r'(?<!\*)\*([^*\n]+?)\*(?!\*)',
-            r'<em>\1</em>',
-            value
-        )
-
-        value = re.sub(
-            r'(?<!_)_([^_\n]+?)_(?!_)',
-            r'<em>\1</em>',
-            value
-        )
+        value = re.sub(r'\*\*\*(.+?)\*\*\*', r'<strong><em>\1</em></strong>', value)
+        value = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', value)
+        value = re.sub(r'__(.+?)__', r'<strong>\1</strong>', value)
+        value = re.sub(r'(?<!\*)\*([^*\n]+?)\*(?!\*)', r'<em>\1</em>', value)
+        value = re.sub(r'(?<!_)_([^_\n]+?)_(?!_)', r'<em>\1</em>', value)
 
         # --------------------------------------------------------
         # Strikethrough
         # --------------------------------------------------------
-
-        value = re.sub(
-            r'~~(.+?)~~',
-            r'<del>\1</del>',
-            value
-        )
+        value = re.sub(r'~~(.+?)~~', r'<del>\1</del>', value)
 
         # --------------------------------------------------------
         # Restore Gemini HTML
         # --------------------------------------------------------
-
         for placeholder, html_tag in placeholders.items():
-            value = value.replace(
-                placeholder,
-                html_tag
-            )
+            value = value.replace(placeholder, html_tag)
 
         return value
-
 
     # ============================================================
     # 5. TABLE FUNCTIONS
     # ============================================================
 
     def is_table_separator(line):
-
         stripped = line.strip()
-
         if stripped.startswith("|"):
             stripped = stripped[1:]
-
         if stripped.endswith("|"):
             stripped = stripped[:-1]
-
         cells = stripped.split("|")
-
         if not cells:
             return False
-
-        return all(
-            re.match(
-                r"^\s*:?-{3,}:?\s*$",
-                cell
-            )
-            for cell in cells
-        )
-
+        return all(re.match(r"^\s*:?-{3,}:?\s*$", cell) for cell in cells)
 
     def split_table_row(line):
-
         line = line.strip()
-
         if line.startswith("|"):
             line = line[1:]
-
         if line.endswith("|"):
             line = line[:-1]
-
-        return [
-            cell.strip()
-            for cell in line.split("|")
-        ]
-
+        return [cell.strip() for cell in line.split("|")]
 
     def render_table(table_lines):
-
         if len(table_lines) < 2:
             return None
 
-        header = split_table_row(
-            table_lines[0]
-        )
+        header = split_table_row(table_lines[0])
+        separator = split_table_row(table_lines[1])
 
-        separator = split_table_row(
-            table_lines[1]
-        )
-
-        if not is_table_separator(
-            table_lines[1]
-        ):
+        if not is_table_separator(table_lines[1]):
             return None
 
-        # --------------------------------------------------------
-        # Alignment
-        # --------------------------------------------------------
-
         alignments = []
-
         for cell in separator:
-
             cell = cell.strip()
-
             if cell.startswith(":") and cell.endswith(":"):
                 alignments.append("center")
-
             elif cell.endswith(":"):
                 alignments.append("right")
-
             else:
                 alignments.append("left")
 
-        # --------------------------------------------------------
-        # Rows
-        # --------------------------------------------------------
-
         rows = []
-
         for line in table_lines[2:]:
-
             if not line.strip():
                 continue
-
             if "|" not in line:
                 continue
-
             cells = split_table_row(line)
-
-            # Normalize number of columns
             if len(cells) < len(header):
-                cells += [""] * (
-                    len(header) - len(cells)
-                )
-
+                cells += [""] * (len(header) - len(cells))
             elif len(cells) > len(header):
                 cells = cells[:len(header)]
-
             rows.append(cells)
 
-        # --------------------------------------------------------
-        # Table
-        # --------------------------------------------------------
+        parts = []
+        parts.append(
+            '<div style="width:100%;overflow-x:auto;margin:16px 0 20px 0;'
+            'border:1px solid #d9dee7;border-radius:10px;'
+            'box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+        )
+        parts.append(
+            '<table style="width:100%;border-collapse:collapse;'
+            "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;"
+            'font-size:14px;background:#ffffff;">'
+        )
+        parts.append("<thead><tr>")
 
-        html = """
-        <div style="
-            width:100%;
-            overflow-x:auto;
-            margin:16px 0 20px 0;
-            border:1px solid #d9dee7;
-            border-radius:10px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.06);
-        ">
-
-        <table style="
-            width:100%;
-            border-collapse:collapse;
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                'Segoe UI',
-                Arial,
-                sans-serif;
-            font-size:14px;
-            background:#ffffff;
-        ">
-
-        <thead>
-        <tr>
-        """
-
-        # Header
         for i, cell in enumerate(header):
-
-            align = (
-                alignments[i]
-                if i < len(alignments)
-                else "left"
+            align = alignments[i] if i < len(alignments) else "left"
+            parts.append(
+                f'<th style="padding:11px 13px;text-align:{align};'
+                "background:linear-gradient(135deg,#002e6e 0%,#0059b3 100%);"
+                "color:#ffffff;font-weight:700;border-bottom:2px solid #f7941d;"
+                f'white-space:nowrap;">{inline_markdown(cell)}</th>'
             )
 
-            html += f"""
-            <th style="
-                padding:11px 13px;
-                text-align:{align};
-                background:linear-gradient(
-                    135deg,
-                    #002e6e 0%,
-                    #0059b3 100%
-                );
-                color:#ffffff;
-                font-weight:700;
-                border-bottom:2px solid #f7941d;
-                white-space:nowrap;
-            ">
-                {inline_markdown(cell)}
-            </th>
-            """
+        parts.append("</tr></thead><tbody>")
 
-        html += """
-        </tr>
-        </thead>
-        <tbody>
-        """
-
-        # Body
         for row_index, row in enumerate(rows):
-
-            background = (
-                "#ffffff"
-                if row_index % 2 == 0
-                else "#f6f8fb"
-            )
-
-            html += "<tr>"
-
+            background = "#ffffff" if row_index % 2 == 0 else "#f6f8fb"
+            parts.append("<tr>")
             for col_index, cell in enumerate(row):
-
-                align = (
-                    alignments[col_index]
-                    if col_index < len(alignments)
-                    else "left"
+                align = alignments[col_index] if col_index < len(alignments) else "left"
+                parts.append(
+                    f'<td style="padding:9px 13px;text-align:{align};'
+                    f"background:{background};color:#202124;"
+                    "border-bottom:1px solid #e5e7eb;vertical-align:middle;"
+                    f'line-height:1.45;">{inline_markdown(cell)}</td>'
                 )
+            parts.append("</tr>")
 
-                html += f"""
-                <td style="
-                    padding:9px 13px;
-                    text-align:{align};
-                    background:{background};
-                    color:#202124;
-                    border-bottom:1px solid #e5e7eb;
-                    vertical-align:middle;
-                    line-height:1.45;
-                ">
-                    {inline_markdown(cell)}
-                </td>
-                """
+        parts.append("</tbody></table></div>")
 
-            html += "</tr>"
-
-        html += """
-        </tbody>
-        </table>
-        </div>
-        """
-
-        return html
-
+        return "".join(parts)
 
     # ============================================================
     # 6. MAIN PARSER
     # ============================================================
 
     lines = text.split("\n")
-
     output = []
-
     i = 0
 
     in_code = False
     code_lines = []
+    code_lang = ""
 
     in_ul = False
     in_ol = False
 
-
     def close_lists():
-
         nonlocal in_ul, in_ol
-
         if in_ul:
             output.append("</ul>")
             in_ul = False
-
         if in_ol:
             output.append("</ol>")
             in_ol = False
-
 
     while i < len(lines):
 
@@ -512,514 +374,277 @@ def text_to_html(text: str) -> str:
         # ========================================================
         # CODE BLOCK
         # ========================================================
-
         if stripped.startswith("```"):
 
             if not in_code:
-
                 close_lists()
-
                 in_code = True
                 code_lines = []
-
+                code_lang = stripped[3:].strip().upper()
             else:
-
-                code = html_lib.escape(
-                    "\n".join(code_lines)
-                )
-
+                code = html_lib.escape("\n".join(code_lines))
+                label = code_lang if code_lang else "CODE"
                 output.append(
-                    f"""
-                    <div style="
-                        margin:14px 0;
-                        border-radius:10px;
-                        overflow:hidden;
-                        background:#0d1117;
-                        border:1px solid #30363d;
-                        box-shadow:
-                            0 2px 8px
-                            rgba(0,0,0,0.12);
-                    ">
-
-                        <div style="
-                            padding:6px 12px;
-                            background:#161b22;
-                            color:#8b949e;
-                            font-size:11px;
-                            font-weight:700;
-                            letter-spacing:0.5px;
-                        ">
-                            CODE
-                        </div>
-
-                        <pre style="
-                            margin:0;
-                            padding:14px;
-                            overflow-x:auto;
-                            color:#e6edf3;
-                            font-family:
-                                Consolas,
-                                'Courier New',
-                                monospace;
-                            font-size:13px;
-                            line-height:1.55;
-                        "><code>{code}</code></pre>
-
-                    </div>
-                    """
+                    '<div style="margin:14px 0;border-radius:10px;overflow:hidden;'
+                    'background:#0d1117;border:1px solid #30363d;'
+                    'box-shadow:0 2px 8px rgba(0,0,0,0.12);">'
+                    '<div style="padding:6px 12px;background:#161b22;color:#8b949e;'
+                    f'font-size:11px;font-weight:700;letter-spacing:0.5px;">{label}</div>'
+                    '<pre style="margin:0;padding:14px;overflow-x:auto;color:#e6edf3;'
+                    "font-family:Consolas,'Courier New',monospace;font-size:13px;"
+                    f'line-height:1.55;"><code>{code}</code></pre></div>'
                 )
-
                 in_code = False
                 code_lines = []
+                code_lang = ""
 
             i += 1
             continue
 
-
         if in_code:
-
             code_lines.append(raw)
             i += 1
             continue
 
-
         # ========================================================
         # BLANK LINE
         # ========================================================
-
         if not stripped:
-
             close_lists()
-
             i += 1
             continue
-
 
         # ========================================================
         # TABLE
         # ========================================================
-
         if (
             i + 1 < len(lines)
             and "|" in stripped
             and is_table_separator(lines[i + 1])
         ):
-
             close_lists()
 
-            table_lines = [
-                lines[i],
-                lines[i + 1]
-            ]
-
+            table_lines = [lines[i], lines[i + 1]]
             j = i + 2
 
             while j < len(lines):
-
                 candidate = lines[j].strip()
-
                 if not candidate:
                     break
-
                 if "|" not in candidate:
                     break
-
-                table_lines.append(
-                    lines[j]
-                )
-
+                table_lines.append(lines[j])
                 j += 1
 
-            rendered = render_table(
-                table_lines
-            )
+            rendered = render_table(table_lines)
 
             if rendered:
-
                 output.append(rendered)
-
                 i = j
                 continue
-
 
         # ========================================================
         # HEADINGS
         # ========================================================
-
-        heading = re.match(
-            r"^(#{1,6})\s+(.+)$",
-            stripped
-        )
+        heading = re.match(r"^(#{1,6})\s+(.+)$", stripped)
 
         if heading:
-
             close_lists()
 
-            level = len(
-                heading.group(1)
-            )
-
+            level = len(heading.group(1))
             title = heading.group(2)
 
             if level == 1:
-
-                style = """
-                    font-size:24px;
-                    color:#002e6e;
-                    border-bottom:
-                        3px solid #f7941d;
-                    padding-bottom:8px;
-                    margin:
-                        18px 0 12px 0;
-                """
-
+                style = (
+                    "font-size:24px;color:#002e6e;border-bottom:3px solid #f7941d;"
+                    "padding-bottom:8px;margin:18px 0 12px 0;"
+                )
             elif level == 2:
-
-                style = """
-                    font-size:20px;
-                    color:#002e6e;
-                    border-left:
-                        5px solid #f7941d;
-                    padding-left:11px;
-                    margin:
-                        18px 0 10px 0;
-                """
-
+                style = (
+                    "font-size:20px;color:#002e6e;border-left:5px solid #f7941d;"
+                    "padding-left:11px;margin:18px 0 10px 0;"
+                )
             elif level == 3:
-
-                style = """
-                    font-size:17px;
-                    color:#0059b3;
-                    margin:
-                        15px 0 8px 0;
-                """
-
+                style = "font-size:17px;color:#0059b3;margin:15px 0 8px 0;"
             else:
-
-                style = """
-                    font-size:15px;
-                    color:#333333;
-                    margin:
-                        12px 0 6px 0;
-                """
+                style = "font-size:15px;color:#333333;margin:12px 0 6px 0;"
 
             output.append(
-                f"""
-                <h{level} style="
-                    {style}
-                    font-weight:700;
-                    line-height:1.35;
-                ">
-                    {inline_markdown(title)}
-                </h{level}>
-                """
+                f'<h{level} style="{style}font-weight:700;line-height:1.35;">'
+                f"{inline_markdown(title)}</h{level}>"
             )
 
             i += 1
             continue
-
 
         # ========================================================
         # HORIZONTAL RULE
         # ========================================================
-
-        if re.match(
-            r"^([-*_])(?:\s*\1){2,}$",
-            stripped
-        ):
-
+        if re.match(r"^([-*_])(?:\s*\1){2,}$", stripped):
             close_lists()
-
             output.append(
-                """
-                <div style="
-                    height:2px;
-                    margin:16px 0;
-                    background:
-                        linear-gradient(
-                            90deg,
-                            transparent,
-                            #d5dbe5,
-                            #f7941d,
-                            #d5dbe5,
-                            transparent
-                        );
-                "></div>
-                """
+                '<div style="height:2px;margin:16px 0;background:'
+                "linear-gradient(90deg,transparent,#d5dbe5,#f7941d,#d5dbe5,transparent);\"></div>"
             )
-
             i += 1
             continue
-
 
         # ========================================================
         # BLOCKQUOTE
         # ========================================================
-
         if stripped.startswith(">"):
-
             close_lists()
-
-            quote = re.sub(
-                r"^>\s?",
-                "",
-                stripped
-            )
-
+            quote = re.sub(r"^>\s?", "", stripped)
             output.append(
-                f"""
-                <div style="
-                    margin:10px 0;
-                    padding:11px 15px;
-                    border-left:
-                        4px solid #f7941d;
-                    background:#fff8ef;
-                    color:#4b5563;
-                    border-radius:
-                        0 8px 8px 0;
-                    line-height:1.55;
-                ">
-                    {inline_markdown(quote)}
-                </div>
-                """
+                '<div style="margin:10px 0;padding:11px 15px;border-left:4px solid #f7941d;'
+                'background:#fff8ef;color:#4b5563;border-radius:0 8px 8px 0;line-height:1.55;">'
+                f"{inline_markdown(quote)}</div>"
             )
-
             i += 1
             continue
-
 
         # ========================================================
         # BULLET
         # ========================================================
-
-        bullet = re.match(
-            r"^[-*+]\s+(.+)$",
-            stripped
-        )
+        bullet = re.match(r"^[-*+]\s+(.+)$", stripped)
 
         if bullet:
-
             if in_ol:
-
                 output.append("</ol>")
                 in_ol = False
-
             if not in_ul:
-
-                output.append(
-                    """
-                    <ul style="
-                        margin:
-                            7px 0 12px 24px;
-                        padding-left:15px;
-                    ">
-                    """
-                )
-
+                output.append('<ul style="margin:7px 0 12px 24px;padding-left:15px;">')
                 in_ul = True
 
             item = bullet.group(1)
-
             output.append(
-                f"""
-                <li style="
-                    margin:5px 0;
-                    padding-left:3px;
-                    line-height:1.55;
-                ">
-                    {inline_markdown(item)}
-                </li>
-                """
+                f'<li style="margin:5px 0;padding-left:3px;line-height:1.55;">'
+                f"{inline_markdown(item)}</li>"
             )
 
             i += 1
             continue
-
 
         # ========================================================
         # NUMBERED LIST
         # ========================================================
-
-        numbered = re.match(
-            r"^\d+[.)]\s+(.+)$",
-            stripped
-        )
+        numbered = re.match(r"^\d+[.)]\s+(.+)$", stripped)
 
         if numbered:
-
             if in_ul:
-
                 output.append("</ul>")
                 in_ul = False
-
             if not in_ol:
-
-                output.append(
-                    """
-                    <ol style="
-                        margin:
-                            7px 0 12px 24px;
-                        padding-left:15px;
-                    ">
-                    """
-                )
-
+                output.append('<ol style="margin:7px 0 12px 24px;padding-left:15px;">')
                 in_ol = True
 
             item = numbered.group(1)
-
             output.append(
-                f"""
-                <li style="
-                    margin:6px 0;
-                    padding-left:3px;
-                    line-height:1.55;
-                ">
-                    {inline_markdown(item)}
-                </li>
-                """
+                f'<li style="margin:6px 0;padding-left:3px;line-height:1.55;">'
+                f"{inline_markdown(item)}</li>"
             )
 
             i += 1
             continue
 
-
         # ========================================================
         # NORMAL PARAGRAPH
         # ========================================================
-
         close_lists()
 
-        paragraph = inline_markdown(
-            stripped
-        )
-
+        paragraph = inline_markdown(stripped)
         output.append(
-            f"""
-            <div style="
-                margin:6px 0;
-                color:#202124;
-                font-size:14px;
-                line-height:1.65;
-            ">
-                {paragraph}
-            </div>
-            """
+            '<div style="margin:6px 0;color:#202124;font-size:14px;line-height:1.65;">'
+            f"{paragraph}</div>"
         )
 
         i += 1
 
-
     # ============================================================
     # CLOSE ANY OPEN ELEMENTS
     # ============================================================
-
     if in_code:
-
-        code = html_lib.escape(
-            "\n".join(code_lines)
-        )
-
+        code = html_lib.escape("\n".join(code_lines))
         output.append(
-            f"""
-            <pre style="
-                background:#0d1117;
-                color:#e6edf3;
-                padding:14px;
-                border-radius:8px;
-                overflow-x:auto;
-            ">{code}</pre>
-            """
+            '<pre style="background:#0d1117;color:#e6edf3;padding:14px;'
+            f'border-radius:8px;overflow-x:auto;">{code}</pre>'
         )
 
     close_lists()
 
-
-    # ============================================================
-    # RESTORE ANY REMAINING PROTECTED HTML
-    # ============================================================
-
     result = "\n".join(output)
 
     # ============================================================
-    # FINAL FINANCIAL HIGHLIGHTING
+    # FINAL RISK-LEVEL HIGHLIGHTING (plain-text occurrences only)
     # ============================================================
-
-    # Only highlight plain text occurrences.
-    # Existing HTML is left untouched.
-
     result = re.sub(
         r"\bHIGH RISK\b",
-        """
-        <span style="
-            display:inline-block;
-            background:#fde8e8;
-            color:#b42318;
-            padding:3px 9px;
-            border-radius:14px;
-            font-weight:700;
-            font-size:12px;
-        ">HIGH RISK</span>
-        """,
+        '<span style="display:inline-block;background:#fde8e8;color:#b42318;'
+        'padding:3px 9px;border-radius:14px;font-weight:700;font-size:12px;">'
+        "HIGH RISK</span>",
         result,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
-
     result = re.sub(
         r"\bMEDIUM RISK\b",
-        """
-        <span style="
-            display:inline-block;
-            background:#fff4d6;
-            color:#9a6700;
-            padding:3px 9px;
-            border-radius:14px;
-            font-weight:700;
-            font-size:12px;
-        ">MEDIUM RISK</span>
-        """,
+        '<span style="display:inline-block;background:#fff4d6;color:#9a6700;'
+        'padding:3px 9px;border-radius:14px;font-weight:700;font-size:12px;">'
+        "MEDIUM RISK</span>",
         result,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
-
     result = re.sub(
         r"\bLOW RISK\b",
-        """
-        <span style="
-            display:inline-block;
-            background:#e7f7ed;
-            color:#18794e;
-            padding:3px 9px;
-            border-radius:14px;
-            font-weight:700;
-            font-size:12px;
-        ">LOW RISK</span>
-        """,
+        '<span style="display:inline-block;background:#e7f7ed;color:#18794e;'
+        'padding:3px 9px;border-radius:14px;font-weight:700;font-size:12px;">'
+        "LOW RISK</span>",
         result,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE,
     )
 
     # ============================================================
     # OUTER CONTAINER
     # ============================================================
+    final_html = (
+        '<div style="width:100%;box-sizing:border-box;'
+        "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;"
+        f'color:#202124;line-height:1.6;">{result}</div>'
+    )
 
-    return f"""
-    <div style="
-        width:100%;
-        box-sizing:border-box;
-        font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            'Segoe UI',
-            Roboto,
-            Arial,
-            sans-serif;
-        color:#202124;
-        line-height:1.6;
-    ">
-        {result}
-    </div>
+    # ============================================================
+    # 7. STRIP STRUCTURAL WHITESPACE (the actual fix for st.markdown)
+    # ============================================================
+    # st.markdown() still runs a CommonMark pass even with
+    # unsafe_allow_html=True. Any line starting with 4+ spaces is treated
+    # as an "indented code block" and printed as literal text, which is
+    # what breaks headings/tables/etc. We collapse all structural
+    # newlines/indentation here, while fully preserving the exact
+    # whitespace inside <pre>...</pre> code blocks.
+    return _minify_preserve_pre(final_html)
+
+
+def _minify_preserve_pre(html: str) -> str:
+    """Strip line-leading whitespace and newlines from HTML so it can
+    never be reinterpreted as a CommonMark indented code block, while
+    leaving the contents of <pre>...</pre> blocks byte-for-byte intact.
     """
+
+    pre_blocks = {}
+
+    def protect(m):
+        key = f"@@PRE_BLOCK_{len(pre_blocks)}@@"
+        pre_blocks[key] = m.group(0)
+        return key
+
+    protected = re.sub(r"<pre\b.*?</pre>", protect, html, flags=re.DOTALL | re.IGNORECASE)
+
+    lines = [line.strip() for line in protected.split("\n")]
+    protected = "".join(lines)
+
+    for key, block in pre_blocks.items():
+        protected = protected.replace(key, block)
+
+    return protected
 
 
 def extract_flags(html: str):
