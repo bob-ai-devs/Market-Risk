@@ -103,6 +103,7 @@ def get_stock_data(ticker: str):
             return None
         for window in (20, 50, 100, 200, 400, 600):
             data[f"{window}DMA"] = data["Close"].rolling(window=window).mean()
+        data["inav"] = stock.info.get("regularMarketPrice")
         return data
     except Exception:
         return None
@@ -111,6 +112,7 @@ def get_stock_data(ticker: str):
 def create_stock_dataframe(ticker: str, data: pd.DataFrame) -> pd.DataFrame:
     last_row = data.iloc[-1]
     current_price = last_row["Close"]
+    inav = data["inav"]
 
     def pct_vs_dma(dma_col):
         dma = last_row[dma_col]
@@ -127,6 +129,7 @@ def create_stock_dataframe(ticker: str, data: pd.DataFrame) -> pd.DataFrame:
         "Company Name": [""],
         "Ticker": [display_ticker],
         "Current Price": [round(current_price, 2)],
+        "iNAV": [round(inav, 2)],
         "Death Cross": [int(last_row["50DMA"] < last_row["200DMA"]) if not pd.isna(last_row["50DMA"]) and not pd.isna(last_row["200DMA"]) else 0],
     }
     for window in (20, 50, 100, 200, 400, 600):
