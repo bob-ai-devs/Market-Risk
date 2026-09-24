@@ -20,7 +20,7 @@ Run with:
 Expected repo layout:
     app.py
     requirements.txt
-    models/best_avagPredModel-3.keras   <-- your trained model
+    models/best_model-3.keras   <-- your trained model
 """
 
 import datetime
@@ -47,7 +47,7 @@ NAMES = ["dow", "nasdaq", "crude", "sp500", "nifty50", "nifty_it"]
 NIFTY_COL_INDEX = NAMES.index("nifty50")  # position of nifty50 among the (no-date) feature columns
 LOOKBACK_DAYS = 31  # matches the original full_data[-31:] window
 
-DEFAULT_MODEL_PATH = os.environ.get("MODEL_PATH", "models/best_avagPredModel-3.keras")
+DEFAULT_MODEL_PATH = os.environ.get("MODEL_PATH", "models/best_model.keras")
 
 
 # --------------------------------------------------------------------------- #
