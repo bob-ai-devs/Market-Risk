@@ -11,6 +11,7 @@ import os
 import re
 import time
 import html as html_lib
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -95,20 +96,31 @@ def extract_flags(html: str):
 # --------------------------------------------------------------------------
 
 def get_stock_data(ticker: str):
-    """Fetch full history for `ticker` and attach moving averages."""
+    """
+    Fetch full history for `ticker`, attach moving averages, and grab the
+    latest quoted price (`iNAV`) from `stock.info`.
+
+    Always returns a `(data, inav)` tuple — `(None, None)` on any failure —
+    so callers can safely do `data, inav = get_stock_data(ticker)` without
+    an extra type check first.
+    """
     try:
         stock = yf.Ticker(ticker)
         data = stock.history(period="max")
         if data is None or data.empty:
-            return None
+            return None, None
         for window in (20, 50, 100, 200, 400, 600):
             data[f"{window}DMA"] = data["Close"].rolling(window=window).mean()
-        return data
+        try:
+            inav = stock.info.get("regularMarketPrice")
+        except Exception:
+            inav = None
+        return data, inav
     except Exception:
-        return None
+        return None, None
 
 
-def create_stock_dataframe(ticker: str, data: pd.DataFrame) -> pd.DataFrame:
+def create_stock_dataframe(ticker: str, data: pd.DataFrame, inav: Optional[float] = None) -> pd.DataFrame:
     last_row = data.iloc[-1]
     current_price = last_row["Close"]
 
@@ -127,6 +139,9 @@ def create_stock_dataframe(ticker: str, data: pd.DataFrame) -> pd.DataFrame:
         "Company Name": [""],
         "Ticker": [display_ticker],
         "Current Price": [round(current_price, 2)],
+        # `regularMarketPrice` from stock.info is frequently missing/None
+        # (delisted tickers, off-hours, some NSE symbols) — never round(None).
+        "iNAV": [round(inav, 2) if inav is not None else None],
         "Death Cross": [int(last_row["50DMA"] < last_row["200DMA"]) if not pd.isna(last_row["50DMA"]) and not pd.isna(last_row["200DMA"]) else 0],
     }
     for window in (20, 50, 100, 200, 400, 600):
@@ -138,14 +153,19 @@ def create_stock_dataframe(ticker: str, data: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(stock_data)
 
 
-def create_stock_dataframe_momentum(ticker: str, data: pd.DataFrame = None) -> pd.DataFrame:
+def create_stock_dataframe_momentum(
+    ticker: str,
+    data: pd.DataFrame = None,
+    inav: Optional[float] = None,
+) -> pd.DataFrame:
     """
     Volume-weighted rate-of-change ("momentum") table.
-    Accepts pre-fetched `data` (from get_stock_data) to avoid a second
-    network round-trip per ticker; falls back to fetching it itself.
+    Accepts pre-fetched `data`/`inav` (from get_stock_data) to avoid a
+    second network round-trip per ticker; falls back to fetching them
+    itself if only called with a ticker.
     """
     if data is None:
-        data = get_stock_data(ticker)
+        data, inav = get_stock_data(ticker)
     if data is None or data.empty:
         raise ValueError(f"No data for {ticker}")
 
@@ -171,6 +191,7 @@ def create_stock_dataframe_momentum(ticker: str, data: pd.DataFrame = None) -> p
         "Company Name": [""],
         "Ticker": [display_ticker],
         "Current Price": [round(current_price, 2)],
+        "iNAV": [round(inav, 2) if inav is not None else None],
         "1DMoM": [roc_values[1]],
         "5DMoM": [roc_values[5]],
         "10DMoM": [roc_values[10]],
@@ -294,7 +315,7 @@ def build_stock_table(
 
         ticker = f"{symbol}.NS" if use_ns_suffix else symbol
 
-        data = get_stock_data(ticker)
+        data, inav = get_stock_data(ticker)
         if data is None or data.empty:
             if progress_callback:
                 progress_callback(i + 1, total, time.time() - start_time)
@@ -302,13 +323,17 @@ def build_stock_table(
 
         try:
             if view_value == "momentum":
-                stock_df = create_stock_dataframe_momentum(ticker, data)
+                stock_df = create_stock_dataframe_momentum(ticker, data, inav)
             else:
-                stock_df = create_stock_dataframe(ticker, data)
+                stock_df = create_stock_dataframe(ticker, data, inav)
                 if view_value == "consolidated":
-                    temp_df = create_stock_dataframe_momentum(ticker, data)
+                    temp_df = create_stock_dataframe_momentum(ticker, data, inav)
                     stock_df = stock_df.drop(columns=["Volume"])
-                    temp_df = temp_df.drop(columns=["Company Name", "Current Price"])
+                    # Both dataframes now carry "iNAV" (and Company Name /
+                    # Current Price) — drop the duplicates from temp_df
+                    # before the column-wise concat below, or the merge
+                    # would produce two "iNAV" columns.
+                    temp_df = temp_df.drop(columns=["Company Name", "Current Price", "iNAV"])
                     stock_df = pd.concat(
                         [stock_df.set_index("Ticker"), temp_df.set_index("Ticker")],
                         axis=1,
