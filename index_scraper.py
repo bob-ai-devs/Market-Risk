@@ -72,7 +72,7 @@ def row_gradient(df, bright_rgb):
     max_idx = max(n - 1, 1)
 
     # Darker starting version while preserving the actual hue
-    dark_start = [max(60, int(channel * 0.45)) for channel in bright_rgb]
+    dark_start = [max(100, int(channel * 0.45)) for channel in bright_rgb]
 
     def get_row_color(row_idx):
         ratio = row_idx / max_idx
