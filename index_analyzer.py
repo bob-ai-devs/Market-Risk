@@ -146,6 +146,7 @@ change_df = st.session_state.change_df.sort_values(
 # Single interval bar plot
 def plot_single_bar(df, interval):
     st.subheader(f"📊 NSE Index % Change: {interval}")
+    df = df.loc[df.fillna(0).ne(0).any(axis=1)].copy()
     df_sorted = (
         df[[interval]]
         .dropna()
@@ -174,6 +175,8 @@ def plot_single_bar(df, interval):
 # Multiple interval grouped bar plot
 def plot_grouped(df, intervals):
     st.subheader("📊 Grouped Index % Changes")
+
+    df = df.loc[df.fillna(0).ne(0).any(axis=1)].copy()
 
     df_sorted = (
         df[intervals]
