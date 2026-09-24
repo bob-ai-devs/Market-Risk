@@ -103,7 +103,7 @@ def get_stock_data(ticker: str):
             return None
         for window in (20, 50, 100, 200, 400, 600):
             data[f"{window}DMA"] = data["Close"].rolling(window=window).mean()
-        data["inav"] = stock.info.get("regularMarketPrice")
+        data["inav"] = stock.info.get("regularMarketPrice").values()
         return data
     except Exception:
         return None
