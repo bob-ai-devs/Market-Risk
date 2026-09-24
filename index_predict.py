@@ -337,8 +337,17 @@ def main():
     if auto_refresh:
         st_autorefresh(interval=refresh_seconds * 1000, key="data_autorefresh")
 
-    st.title("\U0001F4C8 StockAlert \u2014 Nifty 50 Next-Close Predictor")
-    st.caption("Live prediction dashboard (converted from the original Flask app).")
+    # st.title("\U0001F4C8 StockAlert \u2014 Nifty 50 Next-Close Predictor")
+    # st.caption("Live prediction dashboard (converted from the original Flask app).")
+    st.markdown(
+        """
+        <div id="bob-banner">
+            <h1>📈 StockAlert \u2014 Nifty 50 Next-Close Predictor</h1>
+            <p>Live prediction dashboard  •  AI-powered market signals</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     if not os.path.exists(model_path):
         st.error(f"Model file not found at '{model_path}'. Update the path in the sidebar.")
