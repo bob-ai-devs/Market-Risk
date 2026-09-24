@@ -125,9 +125,6 @@ def fetch_change_data():
     return pd.DataFrame(results).T.astype("float")
 
 
-if "analyzer_response" not in st.session_state:
-    st.session_state.analyzer_response = None
-
 # Load NSE data only once per session
 if "change_df" not in st.session_state:
     with st.spinner("Fetching NSE index data..."):
@@ -217,6 +214,9 @@ def plot_grouped(df, intervals):
 
 
 def main():
+
+    if "analyzer_response" not in st.session_state:
+        st.session_state.analyzer_response = None
 
     # Streamlit UI setup
     st.set_page_config(
