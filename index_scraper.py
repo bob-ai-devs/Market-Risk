@@ -76,9 +76,9 @@ def row_gradient(df, dark_rgb):
         ratio = row_idx / max(n - 1, 1)
 
         # Blend dark color with white
-        r = int(dark_rgb[0] + (255 - dark_rgb[0]) * ratio)
-        g = int(dark_rgb[1] + (255 - dark_rgb[1]) * ratio)
-        b = int(dark_rgb[2] + (255 - dark_rgb[2]) * ratio)
+        r = int(dark_rgb[0] - (255 - dark_rgb[0]) * ratio)
+        g = int(dark_rgb[1] - (255 - dark_rgb[1]) * ratio)
+        b = int(dark_rgb[2] - (255 - dark_rgb[2]) * ratio)
 
         return f"rgb({r}, {g}, {b})"
 
@@ -348,9 +348,9 @@ def main():
         st.session_state["last_selection"] = (category, name, view_value, pred_value)
         _run_analysis(category, name, view_value, pred_value)
         dark_rgb = (
-            random.randint(80, 127),
-            random.randint(80, 127),
-            random.randint(80, 127)
+            random.randint(180, 240),
+            random.randint(180, 240),
+            random.randint(180, 240)
         )
         st.session_state.dark_rgb = dark_rgb
 
