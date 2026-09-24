@@ -7,7 +7,7 @@ Docs: https://ai.google.dev/gemini-api/docs/sdks
 
 from google import genai
 
-DEFAULT_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL = "gemini-flash-lite-latest"
 
 
 def get_client(api_key: str) -> genai.Client:
