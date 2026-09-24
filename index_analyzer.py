@@ -126,13 +126,13 @@ def fetch_change_data():
 
 
 if "analyzer_response" not in st.session_state:
-    st.session_state.analyzer_response = ""
+    st.session_state.analyzer_response = None
 
 # Load NSE data only once per session
 if "change_df" not in st.session_state:
     with st.spinner("Fetching NSE index data..."):
         st.session_state.change_df = fetch_change_data()
-        st.session_state.analyzer_response = ""
+        st.session_state.analyzer_response = None
 
 # change_df = st.session_state.change_df
 
@@ -340,7 +340,7 @@ def main():
                         )
 
                 except Exception as e: 
-                    st.session_state.analyzer_response = "" 
+                    st.session_state.analyzer_response = None
                     st.error(
                         f"Gemini analysis failed: {e}"
                     )
