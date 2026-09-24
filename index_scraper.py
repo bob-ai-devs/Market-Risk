@@ -512,7 +512,7 @@ def main():
         if st.session_state["ai_report_html"]:
             with st.container(border=True):
                 st.markdown("**Insight Report Generated from User Prompt**")
-                st.markdown(st.session_state["ai_report_html"], unsafe_allow_html=True)
+                st.markdown(text_to_html(st.session_state["ai_report_html"]), unsafe_allow_html=True)
     else:
         st.info("Pick a category and index above, then click **Run Analysis**.")
 
