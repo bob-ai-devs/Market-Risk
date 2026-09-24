@@ -11,7 +11,7 @@ scipy>=1.11
 google-genai>=0.3.0
 yfinance>=0.2.40
 openpyxl>=3.1
-scikit-learn>=1.3
-tensorflow>=2.13
+scikit-learn
+tensorflow
 streamlit-autorefresh>=1.0.1
 pytz>=2023.3
