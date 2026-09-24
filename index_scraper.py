@@ -67,24 +67,35 @@ def _init_state():
 # ========================================================
 # DARK → LIGHT ROW COLORS
 # ========================================================
-def row_gradient(df, bright_rgb):
+def row_gradient(df, dark_rgb):
     n = len(df)
+
+    if n == 0:
+        return pd.DataFrame("", index=df.index, columns=df.columns)
+
     max_idx = max(n - 1, 1)
 
-    # Darker starting version while preserving the actual hue
-    dark_start = [max(100, int(channel * 0.45)) for channel in bright_rgb]
+    # Create a LIGHT version of the same hue
+    light_rgb = (
+        min(255, dark_rgb[0] + int((255 - dark_rgb[0]) * 0.75)),
+        min(255, dark_rgb[1] + int((255 - dark_rgb[1]) * 0.75)),
+        min(255, dark_rgb[2] + int((255 - dark_rgb[2]) * 0.75))
+    )
 
     def get_row_color(row_idx):
         ratio = row_idx / max_idx
 
-        # Interpolate from dark color → light color
-        r = int(dark_start[0] + (255 - dark_start[0]) * ratio)
-        g = int(dark_start[1] + (255 - dark_start[1]) * ratio)
-        b = int(dark_start[2] + (255 - dark_start[2]) * ratio)
+        r = int(dark_rgb[0] + (light_rgb[0] - dark_rgb[0]) * ratio)
+        g = int(dark_rgb[1] + (light_rgb[1] - dark_rgb[1]) * ratio)
+        b = int(dark_rgb[2] + (light_rgb[2] - dark_rgb[2]) * ratio)
 
         return f"rgb({r}, {g}, {b})"
 
-    styles = pd.DataFrame("", index=df.index, columns=df.columns)
+    styles = pd.DataFrame(
+        "",
+        index=df.index,
+        columns=df.columns
+    )
 
     for i, idx in enumerate(df.index):
         color = get_row_color(i)
@@ -351,39 +362,81 @@ def main():
         st.session_state["last_selection"] = (category, name, view_value, pred_value)
         _run_analysis(category, name, view_value, pred_value)
         # Generate a strong red / green / blue / mixed color
+
         color_type = random.choice([
             "red",
             "green",
-            "blue"
+            "blue",
+            "purple",
+            "orange",
+            "pink",
+            "cyan",
+            "teal",
+            "yellow"
         ])
         
         if color_type == "red":
             dark_rgb = (
-                random.randint(180, 240),
-                random.randint(40, 100),
-                random.randint(40, 100)
+                random.randint(170, 230),
+                random.randint(30, 90),
+                random.randint(30, 90)
             )
         
         elif color_type == "green":
             dark_rgb = (
-                random.randint(40, 100),
-                random.randint(180, 240),
+                random.randint(30, 90),
+                random.randint(150, 220),
                 random.randint(40, 100)
             )
         
         elif color_type == "blue":
             dark_rgb = (
-                random.randint(40, 100),
-                random.randint(40, 100),
-                random.randint(180, 240)
+                random.randint(30, 90),
+                random.randint(60, 120),
+                random.randint(170, 235)
             )
         
-        # else:  # mixed
-        #     dark_rgb = (
-        #         random.randint(80, 220),
-        #         random.randint(80, 220),
-        #         random.randint(80, 220)
-        #     )
+        elif color_type == "purple":
+            dark_rgb = (
+                random.randint(130, 190),
+                random.randint(40, 90),
+                random.randint(150, 220)
+            )
+        
+        elif color_type == "orange":
+            dark_rgb = (
+                random.randint(200, 240),
+                random.randint(80, 140),
+                random.randint(20, 70)
+            )
+        
+        elif color_type == "pink":
+            dark_rgb = (
+                random.randint(200, 240),
+                random.randint(50, 110),
+                random.randint(120, 190)
+            )
+        
+        elif color_type == "cyan":
+            dark_rgb = (
+                random.randint(20, 80),
+                random.randint(160, 220),
+                random.randint(170, 230)
+            )
+        
+        elif color_type == "teal":
+            dark_rgb = (
+                random.randint(20, 70),
+                random.randint(130, 190),
+                random.randint(120, 180)
+            )
+        
+        elif color_type == "yellow":
+            dark_rgb = (
+                random.randint(190, 240),
+                random.randint(160, 220),
+                random.randint(30, 90)
+            )
         
         st.session_state.dark_rgb = dark_rgb
 
