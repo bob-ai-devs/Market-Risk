@@ -68,34 +68,30 @@ def _init_state():
 # DARK → LIGHT ROW COLORS
 # ========================================================
 
-def row_gradient(df, dark_rgb):
+def row_gradient(df, bright_rgb):
     n = len(df)
-
+    max_idx = max(n - 1, 1)
+    
+    # 1. Create a dark version of your bright color for the starting row (e.g., 20% brightness)
+    dark_start = [int(channel * 0.2) for channel in bright_rgb]
+    
     def get_row_color(row_idx):
-        # 0 = dark, last row = light
-        ratio = row_idx / max(n - 1, 1)
-
-        # Blend dark color with white
-        # r = int(dark_rgb[0] - (255 - dark_rgb[0]) * ratio)
-        # g = int(dark_rgb[1] - (255 - dark_rgb[1]) * ratio)
-        # b = int(dark_rgb[2] - (255 - dark_rgb[2]) * ratio)
-        r = int(dark_rgb[0] - dark_rgb[0] * ratio)
-        g = int(dark_rgb[1] - dark_rgb[1] * ratio)
-        b = int(dark_rgb[2] - dark_rgb[2] * ratio)
-
+        ratio = row_idx / max_idx
+        
+        # 2. Interpolate from the calculated dark color to pure white (255)
+        r = int(dark_start[0] + (255 - dark_start[0]) * ratio)
+        g = int(dark_start[1] + (255 - dark_start[1]) * ratio)
+        b = int(dark_start[2] + (255 - dark_start[2]) * ratio)
+        
         return f"rgb({r}, {g}, {b})"
-
-    styles = pd.DataFrame(
-        "",
-        index=df.index,
-        columns=df.columns
-    )
-
+    
+    styles = pd.DataFrame("", index=df.index, columns=df.columns)
     for i, idx in enumerate(df.index):
         color = get_row_color(i)
         styles.loc[idx, :] = f"background-color: {color}"
-
+        
     return styles
+
 
 
 # --------------------------------------------------------------------------
