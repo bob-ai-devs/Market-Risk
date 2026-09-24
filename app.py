@@ -2,6 +2,7 @@ import streamlit as st
 
 from index_analyzer import main as analyzer_main
 from index_scraper import main as scraper_main
+from index_predict import main as predict_main
 
 # ============================================================
 # PAGE CONFIG
