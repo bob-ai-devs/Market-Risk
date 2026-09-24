@@ -174,8 +174,9 @@ def _run_analysis(category: str, name: str, view_value: str, pred_value: str):
     
     st.session_state["task_name"] = name
 
-    if "etf" not in st.session_state.task_name:
-        df = df.drop('iNAV', axis=1)
+    # if "etf" not in st.session_state.task_name:
+    #     df = df.drop('iNAV', axis=1)
+    df = df.drop('iNAV', axis=1)
     
     st.session_state["full_df"] = df
     st.session_state["final_df"] = df.copy()
