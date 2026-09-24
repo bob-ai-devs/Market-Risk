@@ -160,10 +160,14 @@ def _run_analysis(category: str, name: str, view_value: str, pred_value: str):
         return
 
     df.index += 1
+    
+    st.session_state["task_name"] = name
 
+    if "etf" not in st.session_state.task_name:
+        df = df.drop('iNAV', axis=1)
+    
     st.session_state["full_df"] = df
     st.session_state["final_df"] = df.copy()
-    st.session_state["task_name"] = name
     st.session_state["generated_at"] = (
         datetime.datetime.now(pytz.utc).astimezone(IST).strftime("%Y-%m-%d %H:%M:%S")
     )
