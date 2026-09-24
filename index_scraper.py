@@ -354,8 +354,7 @@ def main():
         color_type = random.choice([
             "red",
             "green",
-            "blue",
-            "mixed"
+            "blue"
         ])
         
         if color_type == "red":
@@ -379,12 +378,12 @@ def main():
                 random.randint(180, 240)
             )
         
-        else:  # mixed
-            dark_rgb = (
-                random.randint(80, 220),
-                random.randint(80, 220),
-                random.randint(80, 220)
-            )
+        # else:  # mixed
+        #     dark_rgb = (
+        #         random.randint(80, 220),
+        #         random.randint(80, 220),
+        #         random.randint(80, 220)
+        #     )
         
         st.session_state.dark_rgb = dark_rgb
 
