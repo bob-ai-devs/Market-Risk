@@ -317,8 +317,24 @@ def main():
         # st.markdown(METHODOLOGY_NOTE)
         
 
+        # ============================================================
+        # METHODOLOGY CARDS
+        # ============================================================
+        
         st.markdown("### 📊 20-Day Momentum Methodology")
-
+        
+        # Different color for every card
+        momentum_color = "#f7941d"       # Orange
+        dma_color = "#0059b3"            # Blue
+        selling_color = "#dc3545"        # Red
+        holding_color = "#198754"        # Green
+        longterm_color = "#6f42c1"       # Purple
+        recent_color = "#e67e22"          # Dark orange
+        historical_color = "#17a2b8"      # Teal
+        momentum_view_color = "#8e44ad"   # Violet
+        interpret_color = "#795548"       # Brown
+        
+        
         # ============================================================
         # ROW 1
         # ============================================================
@@ -326,47 +342,101 @@ def main():
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            with st.container(border=True):
-                st.markdown("#### 📈 20-Day Momentum")
-                st.markdown("**Volume-weighted ROC**")
-                st.latex(
-                    r"""
-                    \text{Weighted ROC}_t^{(20)}
-                    =
-                    \frac{
-                        \sum_{i=t-19}^{t}
-                        \left(
-                            \frac{P_i-P_{i-1}}{P_{i-1}}
-                            \times V_i
-                        \right)
-                    }{
-                        \sum_{i=t-19}^{t} V_i
-                    }
-                    \times 100
-                    """
-                )
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {momentum_color};">
+        
+                    <div class="methodology-title">
+                        20-Day Momentum
+                    </div>
+        
+                    <div class="methodology-value"
+                         style="color:{momentum_color};">
+                        Volume-Weighted ROC
+                    </div>
+        
+                    <div class="methodology-text">
+                        Momentum calculated using price changes
+                        weighted by trading volume over the most
+                        recent 20 trading days.
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
+            # Formula outside HTML so LaTeX renders correctly
+            st.latex(
+                r"""
+                \text{Weighted ROC}_t^{(20)}
+                =
+                \frac{
+                \sum_{i=t-19}^{t}
+                \left(
+                \frac{P_i-P_{i-1}}{P_{i-1}}
+                \times V_i
+                \right)}
+                {\sum_{i=t-19}^{t}V_i}
+                \times100
+                """
+            )
+        
         
         with col2:
-            with st.container(border=True):
-                st.markdown("#### 📊 % Change <N>DMA")
-                st.markdown(
-                    """
-                    Shows how far the **current price** sits
-                    above or below its **N-day moving average**.
-                    """
-                )
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {dma_color};">
+        
+                    <div class="methodology-title">
+                        % Change &lt;N&gt;DMA
+                    </div>
+        
+                    <div class="methodology-value"
+                         style="color:{dma_color};">
+                        Price vs Moving Average
+                    </div>
+        
+                    <div class="methodology-text">
+                        Shows how far the current price sits
+                        above or below its N-day moving average.
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
         
         with col3:
-            with st.container(border=True):
-                st.markdown("#### 🏆 Rank for Selling (1M)")
-                st.markdown(
-                    """
-                    Dense rank of stocks based on their
-                    **% change versus the moving average**.
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {selling_color};">
         
-                    **Rank 1 = strongest**
-                    """
-                )
+                    <div class="methodology-title">
+                        Rank for Selling (1M)
+                    </div>
+        
+                    <div class="methodology-value"
+                         style="color:{selling_color};">
+                        Dense Rank
+                    </div>
+        
+                    <div class="methodology-text">
+                        Dense ranking of stocks based on their
+                        respective percentage change versus the
+                        moving average.
+                        <br><br>
+                        <b>Rank 1 = strongest</b>
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         
         
         # ============================================================
@@ -376,49 +446,89 @@ def main():
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            with st.container(border=True):
-                st.markdown("#### 📌 Rank for Holding")
-                st.markdown(
-                    """
-                    Applies to:
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {holding_color};">
         
-                    **3M / 6M / 1Y**
+                    <div class="methodology-title">
+                        Rank for Holding
+                    </div>
         
-                    Dense ranking based on the respective
-                    **% change versus moving average**.
+                    <div class="methodology-value"
+                         style="color:{holding_color};">
+                        3M / 6M / 1Y
+                    </div>
         
-                    **Rank 1 = strongest**
-                    """
-                )
+                    <div class="methodology-text">
+                        Dense ranks based on the respective
+                        percentage change versus moving average.
+                        <br><br>
+                        <b>Rank 1 = strongest</b>
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
         
         with col2:
-            with st.container(border=True):
-                st.markdown("#### 🏅 Long Term Holding Rank")
-                st.markdown(
-                    """
-                    Applies to:
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {longterm_color};">
         
-                    **2Y / 3Y**
+                    <div class="methodology-title">
+                        Long Term Holding Rank
+                    </div>
         
-                    Dense ranking based on the respective
-                    **% change versus moving average**.
+                    <div class="methodology-value"
+                         style="color:{longterm_color};">
+                        2Y / 3Y
+                    </div>
         
-                    **Rank 1 = strongest**
-                    """
-                )
+                    <div class="methodology-text">
+                        Dense ranks based on the respective
+                        percentage change versus moving average.
+                        <br><br>
+                        <b>Rank 1 = strongest</b>
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
         
         with col3:
-            with st.container(border=True):
-                st.markdown("#### 🚀 Recent Performance Rank")
-                st.markdown(
-                    """
-                    **Formula:**
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {recent_color};">
         
-                    `3 × (1Y rank) + 2 × (2Y rank) + 1 × (3Y rank)`
+                    <div class="methodology-title">
+                        Recent Performance Rank
+                    </div>
         
-                    **Lower rank = better**
-                    """
-                )
+                    <div class="methodology-value"
+                         style="color:{recent_color};">
+                        Weighted Recent Performance
+                    </div>
+        
+                    <div class="methodology-text">
+                        <b>Formula:</b>
+                        <br>
+                        3 × (1Y rank) + 2 × (2Y rank)
+                        + 1 × (3Y rank)
+                        <br><br>
+                        <b>Lower rank = better</b>
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         
         
         # ============================================================
@@ -428,42 +538,90 @@ def main():
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            with st.container(border=True):
-                st.markdown("#### 📚 Historical Performance Rank")
-                st.markdown(
-                    """
-                    **Formula:**
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {historical_color};">
         
-                    `1 × (1Y rank) + 2 × (2Y rank) + 3 × (3Y rank)`
+                    <div class="methodology-title">
+                        Historical Performance Rank
+                    </div>
         
-                    **Lower rank = better**
-                    """
-                )
+                    <div class="methodology-value"
+                         style="color:{historical_color};">
+                        Weighted Historical Performance
+                    </div>
+        
+                    <div class="methodology-text">
+                        <b>Formula:</b>
+                        <br>
+                        1 × (1Y rank) + 2 × (2Y rank)
+                        + 3 × (3Y rank)
+                        <br><br>
+                        <b>Lower rank = better</b>
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
         
         with col2:
-            with st.container(border=True):
-                st.markdown("#### ⚡ Momentum View")
-                st.markdown(
-                    """
-                    Columns such as:
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {momentum_view_color};">
         
-                    **<N>DMoM**
+                    <div class="methodology-title">
+                        Momentum View
+                    </div>
         
-                    represent the **volume-weighted rate-of-change**
-                    calculated over **N days**.
-                    """
-                )
+                    <div class="methodology-value"
+                         style="color:{momentum_view_color};">
+                        &lt;N&gt;DMoM
+                    </div>
+        
+                    <div class="methodology-text">
+                        Momentum view columns represent the
+                        volume-weighted rate-of-change calculated
+                        over N days.
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
         
         with col3:
-            with st.container(border=True):
-                st.markdown("#### 📖 Interpretation")
-                st.markdown(
-                    """
-                    Momentum combines **price movement and trading
-                    volume**, giving greater weight to price changes
-                    occurring with higher volume.
-                    """
-                )
+            st.markdown(
+                f"""
+                <div class="methodology-card"
+                     style="border-left:5px solid {interpret_color};">
+        
+                    <div class="methodology-title">
+                        Interpretation
+                    </div>
+        
+                    <div class="methodology-value"
+                         style="color:{interpret_color};">
+                        Price + Volume
+                    </div>
+        
+                    <div class="methodology-text">
+                        Momentum combines price movement and
+                        trading volume, giving greater influence
+                        to price changes occurring with higher
+                        volume.
+                    </div>
+        
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    
 
 
     
