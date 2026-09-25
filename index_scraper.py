@@ -284,7 +284,7 @@ Do not include the full dataset, headers, or explanations — only the result.
 
 def main():
     try:
-        st.set_page_config(page_title="StockAlert", page_icon="📈", layout="wide")
+        st.set_page_config(page_title="Index Scraper", page_icon="📊", layout="wide")
     except Exception:
         # set_page_config can only be called once per session; ignore if a
         # host script already called it before importing this module.
