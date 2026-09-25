@@ -295,7 +295,7 @@ def main():
     st.markdown(
         """
         <div id="bob-banner">
-            <h1>📈 Index Scraper</h1>
+            <h1>📊 Index Scraper</h1>
             <p>Market intelligence • Moving-average, momentum and AI-driven stock screening</p>
         </div>
         """, unsafe_allow_html=True
