@@ -37,6 +37,7 @@ from sklearn.preprocessing import MinMaxScaler
 from streamlit_autorefresh import st_autorefresh
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import load_model
+import plotly.graph_objects as go
 
 # --------------------------------------------------------------------------- #
 # Config
@@ -432,29 +433,126 @@ def render_metrics(stats):
 
 
 
+# def render_averages_chart():
+#     ss = st.session_state
+#     if len(ss.avg_curr) < 2:
+#         st.info("The rolling-average chart will appear after a couple of refresh cycles.")
+#         return
+
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     ax.plot(ss.avg_curr, label="Current", color="lightblue")
+#     ax.plot(ss.avg_30s, label="30s", color="green", linestyle="dashed")
+#     ax.plot(ss.avg_1m, label="1m", color="gold", linestyle="dashed")
+#     ax.plot(ss.avg_2m, label="2m", color="blue", linestyle="dashed")
+#     ax.plot(ss.avg_3m, label="3m", color="magenta", linestyle="dashed")
+#     ax.plot(ss.avg_5m, label="5m", color="deepskyblue", linestyle="dashed")
+#     ax.plot(ss.avg_10m, label="10m", color="red", linestyle="dashed")
+#     ax.plot(ss.avg_total, label="Total", color="plum", linestyle="dashed")
+#     ax.set_xlabel("Refresh cycle")
+#     ax.set_ylabel("Average value")
+#     ax.set_title("Current value vs. rolling averages")
+#     ax.legend()
+#     ax.grid(True)
+#     st.pyplot(fig)
+#     plt.close(fig)
+
+
 def render_averages_chart():
     ss = st.session_state
+
     if len(ss.avg_curr) < 2:
         st.info("The rolling-average chart will appear after a couple of refresh cycles.")
         return
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(ss.avg_curr, label="Current", color="lightblue")
-    ax.plot(ss.avg_30s, label="30s", color="green", linestyle="dashed")
-    ax.plot(ss.avg_1m, label="1m", color="gold", linestyle="dashed")
-    ax.plot(ss.avg_2m, label="2m", color="blue", linestyle="dashed")
-    ax.plot(ss.avg_3m, label="3m", color="magenta", linestyle="dashed")
-    ax.plot(ss.avg_5m, label="5m", color="deepskyblue", linestyle="dashed")
-    ax.plot(ss.avg_10m, label="10m", color="red", linestyle="dashed")
-    ax.plot(ss.avg_total, label="Total", color="plum", linestyle="dashed")
-    ax.set_xlabel("Refresh cycle")
-    ax.set_ylabel("Average value")
-    ax.set_title("Current value vs. rolling averages")
-    ax.legend()
-    ax.grid(True)
-    st.pyplot(fig)
-    plt.close(fig)
+    fig = go.Figure()
 
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_curr),
+        mode="lines",
+        name="Current",
+        line=dict(color="lightblue")
+    ))
+
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_30s),
+        mode="lines",
+        name="30s",
+        line=dict(color="green", dash="dash")
+    ))
+
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_1m),
+        mode="lines",
+        name="1m",
+        line=dict(color="gold", dash="dash")
+    ))
+
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_2m),
+        mode="lines",
+        name="2m",
+        line=dict(color="blue", dash="dash")
+    ))
+
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_3m),
+        mode="lines",
+        name="3m",
+        line=dict(color="magenta", dash="dash")
+    ))
+
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_5m),
+        mode="lines",
+        name="5m",
+        line=dict(color="deepskyblue", dash="dash")
+    ))
+
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_10m),
+        mode="lines",
+        name="10m",
+        line=dict(color="red", dash="dash")
+    ))
+
+    fig.add_trace(go.Scatter(
+        y=list(ss.avg_total),
+        mode="lines",
+        name="Total",
+        line=dict(color="plum", dash="dash")
+    ))
+
+    fig.update_layout(
+        title="Current value vs. rolling averages",
+        xaxis_title="Refresh cycle",
+        yaxis_title="Average value",
+        hovermode="x unified",
+        height=450,
+        margin=dict(l=50, r=20, t=60, b=50),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="left",
+            x=0
+        )
+    )
+
+    fig.update_xaxes(
+        showgrid=True,
+        rangeslider=dict(visible=True)
+    )
+
+    fig.update_yaxes(
+        showgrid=True
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        key="averages_interactive_chart"
+    )
+  
 
 def render_table(merged_data: pd.DataFrame):
     st.subheader("Prediction history (last 30 trading days)")
