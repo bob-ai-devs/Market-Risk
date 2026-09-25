@@ -235,6 +235,26 @@ def main():
         """,
         unsafe_allow_html=True,
     )
+
+    # Inject custom CSS to style the button
+    st.markdown("""
+        <style>
+        div.stButton > button {
+            background-color: #0066cc;
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+        div.stButton > button:hover {
+            background-color: #0052a3;
+            color: white;
+        }
+        div.stButton > button:active {
+            background-color: #004080;
+            color: white;
+        }
+        </style>
+    """, unsafe_allow_html=True)
     
     selected_intervals = st.multiselect(
         "Select time periods to display:",
