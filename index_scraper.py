@@ -326,7 +326,6 @@ def main():
         historical_color = "#17a2b8"      # Teal
         momentum_view_color = "#8e44ad"   # Violet
         interpret_color = "#795548"       # Brown
-        trend_color = "#795548"       # Brown
 
         # Card CSS
         st.markdown(
@@ -406,24 +405,20 @@ def main():
         with col1:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {momentum_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {momentum_color};">
+                    <div class="metric-title">
                         20-Day Momentum
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{momentum_color};">
+                    <div class="metric-value" style="color:{momentum_color};">
                         Volume-Weighted ROC
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         Momentum calculated using price changes
                         weighted by trading volume over the most
                         recent 20 trading days.
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -449,23 +444,19 @@ def main():
         with col2:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {dma_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {dma_color};">
+                    <div class="metric-title">
                         % Change &lt;N&gt;DMA
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{dma_color};">
+                    <div class="metric-value" style="color:{dma_color};">
                         Price vs Moving Average
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         Shows how far the current price sits
                         above or below its N-day moving average.
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -475,26 +466,22 @@ def main():
         with col3:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {selling_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {selling_color};">
+                    <div class="metric-title">
                         Rank for Selling (1M)
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{selling_color};">
+                    <div class="metric-value" style="color:{selling_color};">
                         Dense Rank
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         Dense ranking of stocks based on their
                         respective percentage change versus the
                         moving average.
                         <br><br>
                         <b>Rank 1 = strongest</b>
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -510,25 +497,21 @@ def main():
         with col1:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {holding_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {holding_color};">
+                    <div class="metric-title">
                         Rank for Holding
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{holding_color};">
+                    <div class="metric-value" style="color:{holding_color};">
                         3M / 6M / 1Y
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         Dense ranks based on the respective
                         percentage change versus moving average.
                         <br><br>
                         <b>Rank 1 = strongest</b>
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -538,25 +521,21 @@ def main():
         with col2:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {longterm_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {longterm_color};">
+                    <div class="metric-title">
                         Long Term Holding Rank
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{longterm_color};">
+                    <div class="metric-value" style="color:{longterm_color};">
                         2Y / 3Y
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         Dense ranks based on the respective
                         percentage change versus moving average.
                         <br><br>
                         <b>Rank 1 = strongest</b>
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -566,19 +545,16 @@ def main():
         with col3:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {recent_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {recent_color};">
+                    <div class="metric-title">
                         Recent Performance Rank
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{recent_color};">
+                    <div class="metric-value" style="color:{recent_color};">
                         Weighted Recent Performance
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         <b>Formula:</b>
                         <br>
                         3 × (1Y rank) + 2 × (2Y rank)
@@ -586,7 +562,6 @@ def main():
                         <br><br>
                         <b>Lower rank = better</b>
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -602,19 +577,16 @@ def main():
         with col1:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {historical_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {historical_color};">
+                    <div class="metric-title">
                         Historical Performance Rank
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{historical_color};">
+                    <div class="metric-value" style="color:{historical_color};">
                         Weighted Historical Performance
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         <b>Formula:</b>
                         <br>
                         1 × (1Y rank) + 2 × (2Y rank)
@@ -622,7 +594,6 @@ def main():
                         <br><br>
                         <b>Lower rank = better</b>
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -632,24 +603,20 @@ def main():
         with col2:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {momentum_view_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {momentum_view_color};">
+                    <div class="metric-title">
                         Momentum View
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{momentum_view_color};">
+                    <div class="metric-value" style="color:{momentum_view_color};">
                         &lt;N&gt;DMoM
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         Momentum view columns represent the
                         volume-weighted rate-of-change calculated
                         over N days.
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -659,30 +626,25 @@ def main():
         with col3:
             st.markdown(
                 f"""
-                <div class="methodology-card"
-                     style="border-left:5px solid {interpret_color};">
-        
-                    <div class="methodology-title">
+                <div class="metric-card" style="border-left:5px solid {interpret_color};">
+                    <div class="metric-title">
                         Interpretation
                     </div>
         
-                    <div class="methodology-value"
-                         style="color:{interpret_color};">
+                    <div class="metric-value" style="color:{interpret_color};">
                         Price + Volume
                     </div>
         
-                    <div class="methodology-text">
+                    <div class="metric-sub">
                         Momentum combines price movement and
                         trading volume, giving greater influence
                         to price changes occurring with higher
                         volume.
                     </div>
-        
                 </div>
                 """,
                 unsafe_allow_html=True
             )
-
     
 
 
