@@ -268,13 +268,6 @@ def main():
             st.session_state.change_df = fetch_change_data()
             st.session_state.analyzer_response = None
 
-        # change_df = st.session_state.change_df
-        
-        # Sort by '1D' column ascending
-        change_df = st.session_state.change_df.sort_values(
-            by='1D',
-            ascending=False
-        )
     
     selected_intervals = st.multiselect(
         "Select time periods to display:",
