@@ -497,6 +497,42 @@ def render_averages_chart():
             )
         )
 
+    # ========================================================
+    # HIGHEST / LOWEST CURRENT VALUE
+    # ========================================================
+    curr_values = list(ss.avg_curr)
+
+    highest_curr = max(curr_values)
+    lowest_curr = min(curr_values)
+
+    # Very light green horizontal line for highest Current
+    fig.add_hline(
+        y=highest_curr,
+        line_color="#b7e4c7",
+        line_width=1.5,
+        line_dash="dot",
+        annotation_text=f"Highest: {highest_curr:.2f}",
+        annotation_position="top right",
+        annotation_font=dict(
+            color="#7fba8f",
+            size=11
+        )
+    )
+
+    # Very light red horizontal line for lowest Current
+    fig.add_hline(
+        y=lowest_curr,
+        line_color="#f5b7b1",
+        line_width=1.5,
+        line_dash="dot",
+        annotation_text=f"Lowest: {lowest_curr:.2f}",
+        annotation_position="bottom right",
+        annotation_font=dict(
+            color="#d98b85",
+            size=11
+        )
+    )
+
     fig.update_layout(
         title=f"Current value vs. rolling averages (Cycle: {len(values)})",
         xaxis_title="Refresh cycle",
