@@ -23,7 +23,7 @@ Angel One Ltd.,Financial Services,ANGELONE,EQ,INE732I01021
 Anupam Rasayan India Ltd.,Chemicals,ANURAS,EQ,INE930P01018
 Aptus Value Housing Finance India Ltd.,Financial Services,APTUS,EQ,INE852O01025
 Asahi India Glass Ltd.,Automobile and Auto Components,ASAHIINDIA,EQ,INE439A01020
-Aster DM Healthcare Ltd.,Healthcare,ASTERDM,EQ,INE914M01019
+Aster DM Quality Care Ltd.,Healthcare,ASTERDM,EQ,INE914M01019
 Ather Energy Ltd.,Automobile and Auto Components,ATHERENERG,EQ,INE0LEZ01016
 Atul Ltd.,Chemicals,ATUL,EQ,INE100A01010
 BEML Ltd.,Capital Goods,BEML,EQ,INE258A01024
@@ -43,6 +43,7 @@ Brigade Enterprises Ltd.,Realty,BRIGADE,EQ,INE791I01019
 C.E. Info Systems Ltd.,Information Technology,MAPMYINDIA,EQ,INE0BV301023
 CCL Products (I) Ltd.,Fast Moving Consumer Goods,CCL,EQ,INE421D01022
 CESC Ltd.,Power,CESC,EQ,INE486A01021
+CIE Automotive India Ltd.,Automobile and Auto Components,CIEINDIA,EQ,INE536H01010
 Can Fin Homes Ltd.,Financial Services,CANFINHOME,EQ,INE477A01020
 Canara HSBC Life Insurance Company Ltd.,Financial Services,CANHLIFE,EQ,INE01TY01017
 Caplin Point Laboratories Ltd.,Healthcare,CAPLIPOINT,EQ,INE475E01026
@@ -76,6 +77,7 @@ Deepak Nitrite Ltd.,Chemicals,DEEPAKNTR,EQ,INE288B01029
 Delhivery Ltd.,Services,DELHIVERY,EQ,INE148O01028
 Devyani International Ltd.,Consumer Services,DEVYANI,EQ,INE872J01023
 Dr. Lal Path Labs Ltd.,Healthcare,LALPATHLAB,EQ,INE600L01024
+Dummy HEG Ltd.,Metals & Mining,DUMMYHEG,EQ,DUM545A01024
 E.I.D. Parry (India) Ltd.,Fast Moving Consumer Goods,EIDPARRY,EQ,INE126A01031
 EIH Ltd.,Consumer Services,EIHOTEL,EQ,INE230A01023
 Elecon Engineering Co. Ltd.,Capital Goods,ELECON,EQ,INE205B01031
@@ -102,10 +104,9 @@ Graphite India Ltd.,Capital Goods,GRAPHITE,EQ,INE371A01025
 Gravita India Ltd.,Metals & Mining,GRAVITA,EQ,INE024L01027
 Great Eastern Shipping Co. Ltd.,Services,GESHIP,EQ,INE017A01032
 Gujarat Mineral Development Corporation Ltd.,Metals & Mining,GMDCLTD,EQ,INE131A01031
-Gujarat State Petronet Ltd.,Oil Gas & Consumable Fuels,GSPL,EQ,INE246F01010
-H.E.G. Ltd.,Capital Goods,HEG,EQ,INE545A01024
 HBL Engineering Ltd.,Capital Goods,HBLENGINE,EQ,INE292B01021
-HFCL Ltd.,Telecommunication,HFCL,EQ,INE548A01028
+HEG Advanced Materials Ltd.,Capital Goods,HEGAM,EQ,INE545A01024
+HFCL Ltd.,Telecommunication,HFCL,BE,INE548A01028
 Himadri Speciality Chemical Ltd.,Chemicals,HSCL,EQ,INE019C01026
 Hindustan Copper Ltd.,Metals & Mining,HINDCOPPER,EQ,INE531E01026
 Home First Finance Company India Ltd.,Financial Services,HOMEFIRST,EQ,INE481N01025
@@ -124,9 +125,8 @@ Indian Overseas Bank,Financial Services,IOB,EQ,INE565A01014
 Indraprastha Gas Ltd.,Oil Gas & Consumable Fuels,IGL,EQ,INE203G01027
 Inox Wind Ltd.,Capital Goods,INOXWIND,EQ,INE066P01011
 Intellect Design Arena Ltd.,Information Technology,INTELLECT,EQ,INE306R01017
-International Gemmological Institute (India) Ltd.,Services,IGIL,EQ,INE0Q9301021
+International Gemological Institute Ltd.,Services,IGIL,EQ,INE0Q9301021
 Inventurus Knowledge Solutions Ltd.,Information Technology,IKS,EQ,INE115Q01022
-J.B. Chemicals & Pharmaceuticals Ltd.,Healthcare,JBCHEPHARM,EQ,INE572A01036
 JBM Auto Ltd.,Automobile and Auto Components,JBMA,EQ,INE927D01051
 JK Tyre & Industries Ltd.,Automobile and Auto Components,JKTYRE,EQ,INE573A01042
 JM Financial Ltd.,Financial Services,JMFINANCIL,EQ,INE780C01023
@@ -188,6 +188,7 @@ Piramal Finance Ltd.,Financial Services,PIRAMALFIN,EQ,INE202B01038
 Piramal Pharma Ltd.,Healthcare,PPLPHARMA,EQ,INE0DK501011
 Poly Medicure Ltd.,Healthcare,POLYMED,EQ,INE205C01021
 Poonawalla Fincorp Ltd.,Financial Services,POONAWALLA,EQ,INE511C01022
+Prime Focus Ltd.,Media Entertainment & Publication,PFOCUS,EQ,INE367G01038
 R R Kabel Ltd.,Capital Goods,RRKABEL,EQ,INE777K01022
 RBL Bank Ltd.,Financial Services,RBLBANK,EQ,INE976G01028
 RHI MAGNESITA INDIA LTD.,Capital Goods,RHIM,EQ,INE743M01012
@@ -204,7 +205,7 @@ Sammaan Capital Ltd.,Financial Services,SAMMAANCAP,EQ,INE148I01020
 Sapphire Foods India Ltd.,Consumer Services,SAPPHIRE,EQ,INE806T01020
 Sarda Energy and Minerals Ltd.,Metals & Mining,SARDAEN,EQ,INE385C01021
 Saregama India Ltd,Media Entertainment & Publication,SAREGAMA,EQ,INE979A01025
-Schneider Electric Infrastructure Ltd.,Capital Goods,SCHNEIDER,BE,INE839M01018
+Schneider Electric Infrastructure Ltd.,Capital Goods,SCHNEIDER,EQ,INE839M01018
 Shipping Corporation of India Ltd.,Services,SCI,EQ,INE109A01011
 Shyam Metalics and Energy Ltd.,Capital Goods,SHYAMMETL,EQ,INE810G01011
 Signatureglobal (India) Ltd.,Realty,SIGNATURE,EQ,INE903U01023
