@@ -315,6 +315,18 @@ def main():
         #     r"{\sum_{i=t-19}^{t} V_i}\times 100$$"
         # )
         # st.markdown(METHODOLOGY_NOTE)
+
+        st.markdown(
+            """
+            <div class="metric-card" style="border-left:5px solid #e67e22;">
+                <div class="metric-title">Mean Absolute % Error</div>
+                <div class="metric-value" style="color:#e67e22;">
+                    """ Hi """%
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         
 
         # ============================================================
