@@ -316,6 +316,18 @@ def main():
         # )
         # st.markdown(METHODOLOGY_NOTE)
 
+        # Different color for every card
+        momentum_color = "#f7941d"       # Orange
+        dma_color = "#0059b3"            # Blue
+        selling_color = "#dc3545"        # Red
+        holding_color = "#198754"        # Green
+        longterm_color = "#6f42c1"       # Purple
+        recent_color = "#e67e22"          # Dark orange
+        historical_color = "#17a2b8"      # Teal
+        momentum_view_color = "#8e44ad"   # Violet
+        interpret_color = "#795548"       # Brown
+        trend_color = "#795548"       # Brown
+
         # Card CSS
         st.markdown(
             f"""
@@ -383,17 +395,6 @@ def main():
         # ============================================================
         
         st.markdown("### 📊 20-Day Momentum Methodology")
-        
-        # Different color for every card
-        momentum_color = "#f7941d"       # Orange
-        dma_color = "#0059b3"            # Blue
-        selling_color = "#dc3545"        # Red
-        holding_color = "#198754"        # Green
-        longterm_color = "#6f42c1"       # Purple
-        recent_color = "#e67e22"          # Dark orange
-        historical_color = "#17a2b8"      # Teal
-        momentum_view_color = "#8e44ad"   # Violet
-        interpret_color = "#795548"       # Brown
         
         
         # ============================================================
