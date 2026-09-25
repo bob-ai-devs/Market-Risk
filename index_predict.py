@@ -247,10 +247,42 @@ def update_rolling_averages(curr_org):
 # Rendering
 # --------------------------------------------------------------------------- #
 
+# def render_metrics(stats):
+#     trend_color = "green" if stats["current_trend_up"] else "red"
+#     pred_color = "green" if stats["pred_trend_up"] else "red"
+#     similarity_color = "green" if stats["correct_pred"] == "Same" else "red"
+#     if stats["same_perc"] > 50:
+#         perc_color = "green"
+#     elif stats["same_perc"] < 50:
+#         perc_color = "red"
+#     else:
+#         perc_color = "orange"
+
+#     col1, col2, col3 = st.columns(3)
+#     with col1:
+#         st.metric("Current Original", stats["curr_org"])
+#         st.markdown(f"**Current Trend:** :{trend_color}[{stats['current_trend']}]")
+#     with col2:
+#         st.metric("Current Predicted", stats["curr_val"])
+#         st.markdown(f"**Predicted Trend:** :{pred_color}[{stats['pred_trend']}]")
+#     with col3:
+#         st.metric("Current Difference", stats["curr_diff"])
+#         st.markdown(f"**Trend Similarity:** :{similarity_color}[{stats['correct_pred']}]")
+
+#     st.markdown(f"**Similarity Percentage:** :{perc_color}[{stats['same_perc']}%]")
+
+#     err1, err2, err3 = st.columns(3)
+#     err1.metric("Mean Absolute Error", stats["mae"])
+#     err2.metric("Root Mean Squared Error", stats["rmse"])
+#     err3.metric("Mean Absolute % Error", f"{stats['mape']}%")
+
+
 def render_metrics(stats):
+
     trend_color = "green" if stats["current_trend_up"] else "red"
     pred_color = "green" if stats["pred_trend_up"] else "red"
     similarity_color = "green" if stats["correct_pred"] == "Same" else "red"
+
     if stats["same_perc"] > 50:
         perc_color = "green"
     elif stats["same_perc"] < 50:
@@ -258,23 +290,54 @@ def render_metrics(stats):
     else:
         perc_color = "orange"
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Current Original", stats["curr_org"])
-        st.markdown(f"**Current Trend:** :{trend_color}[{stats['current_trend']}]")
-    with col2:
-        st.metric("Current Predicted", stats["curr_val"])
-        st.markdown(f"**Predicted Trend:** :{pred_color}[{stats['pred_trend']}]")
-    with col3:
-        st.metric("Current Difference", stats["curr_diff"])
-        st.markdown(f"**Trend Similarity:** :{similarity_color}[{stats['correct_pred']}]")
+    with st.container(border=True):
 
-    st.markdown(f"**Similarity Percentage:** :{perc_color}[{stats['same_perc']}%]")
+        st.markdown(
+            """
+            <style>
+            div[data-testid="stVerticalBlockBorderWrapper"] {
+                background-color: #fff8ef;
+                border: 1px solid #f7941d;
+                border-radius: 8px;
+                padding: 10px 14px;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
 
-    err1, err2, err3 = st.columns(3)
-    err1.metric("Mean Absolute Error", stats["mae"])
-    err2.metric("Root Mean Squared Error", stats["rmse"])
-    err3.metric("Mean Absolute % Error", f"{stats['mape']}%")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.metric("Current Original", stats["curr_org"])
+            st.markdown(
+                f"**Current Trend:** :{trend_color}[{stats['current_trend']}]"
+            )
+
+        with col2:
+            st.metric("Current Predicted", stats["curr_val"])
+            st.markdown(
+                f"**Predicted Trend:** :{pred_color}[{stats['pred_trend']}]"
+            )
+
+        with col3:
+            st.metric("Current Difference", stats["curr_diff"])
+            st.markdown(
+                f"**Trend Similarity:** :{similarity_color}[{stats['correct_pred']}]"
+            )
+
+        st.markdown(
+            f"**Similarity Percentage:** :{perc_color}[{stats['same_perc']}%]"
+        )
+
+        err1, err2, err3 = st.columns(3)
+
+        err1.metric("Mean Absolute Error", stats["mae"])
+        err2.metric("Root Mean Squared Error", stats["rmse"])
+        err3.metric(
+            "Mean Absolute % Error",
+            f"{stats['mape']}%"
+        )
 
 
 def render_averages_chart():
@@ -363,21 +426,7 @@ def main():
 
     update_rolling_averages(stats["curr_org"])
 
-    st.markdown(
-        f"""
-        <div style="
-            background-color: #fff8ef;
-            border: 1px solid #f7941d;
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: #002e6e;
-        ">
-            {render_metrics(stats)}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    # render_metrics(stats)
+    render_metrics(stats)
     st.divider()
     render_averages_chart()
     st.divider()
