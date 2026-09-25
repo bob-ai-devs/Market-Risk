@@ -477,7 +477,7 @@ def render_table(merged_data: pd.DataFrame):
 # --------------------------------------------------------------------------- #
 
 def main():
-    st.set_page_config(page_title="StockAlert - Nifty 50 Predictor", page_icon="\U0001F4C8", layout="wide")
+    st.set_page_config(page_title="StockAlert - Nifty 50 Predictor", page_icon="🔮", layout="wide")
     init_session_state()
 
     st.sidebar.header("Settings")
@@ -492,7 +492,7 @@ def main():
     if auto_refresh:
         st_autorefresh(interval=refresh_seconds * 1000, key="data_autorefresh")
 
-    # st.title("\U0001F4C8 StockAlert \u2014 Nifty 50 Next-Close Predictor")
+    # st.title("🔮 StockAlert \u2014 Nifty 50 Next-Close Predictor")
     # st.caption("Live prediction dashboard (converted from the original Flask app).")
     st.markdown(
         """
