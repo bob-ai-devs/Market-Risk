@@ -247,10 +247,160 @@ def update_rolling_averages(curr_org):
 # Rendering
 # --------------------------------------------------------------------------- #
 
+def render_metrics(stats):
+
+    # -----------------------------
+    # Colors
+    # -----------------------------
+    trend_color = "#198754" if stats["current_trend_up"] else "#dc3545"
+    pred_color = "#198754" if stats["pred_trend_up"] else "#dc3545"
+    similarity_color = (
+        "#198754" if stats["correct_pred"] == "Same" else "#dc3545"
+    )
+
+    if stats["same_perc"] > 50:
+        perc_color = "#198754"
+    elif stats["same_perc"] < 50:
+        perc_color = "#dc3545"
+    else:
+        perc_color = "#fd7e14"
+
+    # -----------------------------
+    # Metric Cards
+    # -----------------------------
+    st.markdown(
+        f"""
+        <style>
+        .metric-card-container {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }}
+
+        .metric-card {{
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 14px 16px;
+            border: 1px solid #e5e5e5;
+            border-left: 5px solid var(--card-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            min-height: 90px;
+        }}
+
+        .metric-title {{
+            font-size: 14px;
+            font-weight: 600;
+            color: #555555;
+            margin-bottom: 7px;
+        }}
+
+        .metric-value {{
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--card-color);
+            line-height: 1.2;
+        }}
+
+        .metric-sub {{
+            font-size: 13px;
+            margin-top: 6px;
+            color: #555555;
+        }}
+
+        .metric-row {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }}
+
+        @media (max-width: 768px) {{
+            .metric-card-container,
+            .metric-row {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+        </style>
+
+        <!-- Current Metrics -->
+        <div class="metric-card-container">
+
+            <div class="metric-card" style="--card-color:{trend_color};">
+                <div class="metric-title">Current Original</div>
+                <div class="metric-value">{stats["curr_org"]}</div>
+                <div class="metric-sub">
+                    Current Trend:
+                    <b style="color:{trend_color};">
+                        {stats["current_trend"]}
+                    </b>
+                </div>
+            </div>
+
+            <div class="metric-card" style="--card-color:{pred_color};">
+                <div class="metric-title">Current Predicted</div>
+                <div class="metric-value">{stats["curr_val"]}</div>
+                <div class="metric-sub">
+                    Predicted Trend:
+                    <b style="color:{pred_color};">
+                        {stats["pred_trend"]}
+                    </b>
+                </div>
+            </div>
+
+            <div class="metric-card" style="--card-color:{similarity_color};">
+                <div class="metric-title">Current Difference</div>
+                <div class="metric-value">{stats["curr_diff"]}</div>
+                <div class="metric-sub">
+                    Trend Similarity:
+                    <b style="color:{similarity_color};">
+                        {stats["correct_pred"]}
+                    </b>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Similarity -->
+        <div class="metric-row">
+
+            <div class="metric-card" style="--card-color:{perc_color};">
+                <div class="metric-title">Similarity Percentage</div>
+                <div class="metric-value">{stats["same_perc"]}%</div>
+            </div>
+
+            <div class="metric-card" style="--card-color:#0059b3;">
+                <div class="metric-title">Mean Absolute Error</div>
+                <div class="metric-value">{stats["mae"]}</div>
+            </div>
+
+            <div class="metric-card" style="--card-color:#6f42c1;">
+                <div class="metric-title">Root Mean Squared Error</div>
+                <div class="metric-value">{stats["rmse"]}</div>
+            </div>
+
+        </div>
+
+        <!-- MAPE -->
+        <div class="metric-row">
+
+            <div class="metric-card" style="--card-color:#e67e22;">
+                <div class="metric-title">Mean Absolute % Error</div>
+                <div class="metric-value">{stats["mape"]}%</div>
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 # def render_metrics(stats):
+
 #     trend_color = "green" if stats["current_trend_up"] else "red"
 #     pred_color = "green" if stats["pred_trend_up"] else "red"
 #     similarity_color = "green" if stats["correct_pred"] == "Same" else "red"
+
 #     if stats["same_perc"] > 50:
 #         perc_color = "green"
 #     elif stats["same_perc"] < 50:
@@ -258,86 +408,54 @@ def update_rolling_averages(curr_org):
 #     else:
 #         perc_color = "orange"
 
-#     col1, col2, col3 = st.columns(3)
-#     with col1:
-#         st.metric("Current Original", stats["curr_org"])
-#         st.markdown(f"**Current Trend:** :{trend_color}[{stats['current_trend']}]")
-#     with col2:
-#         st.metric("Current Predicted", stats["curr_val"])
-#         st.markdown(f"**Predicted Trend:** :{pred_color}[{stats['pred_trend']}]")
-#     with col3:
-#         st.metric("Current Difference", stats["curr_diff"])
-#         st.markdown(f"**Trend Similarity:** :{similarity_color}[{stats['correct_pred']}]")
+#     with st.container(border=True):
 
-#     st.markdown(f"**Similarity Percentage:** :{perc_color}[{stats['same_perc']}%]")
+#         st.markdown(
+#             """
+#             <style>
+#             div[data-testid="stVerticalBlockBorderWrapper"] {
+#                 background-color: #fff8ef;
+#                 border: 1px solid #f7941d;
+#                 border-radius: 8px;
+#                 padding: 10px 14px;
+#             }
+#             </style>
+#             """,
+#             unsafe_allow_html=True
+#         )
 
-#     err1, err2, err3 = st.columns(3)
-#     err1.metric("Mean Absolute Error", stats["mae"])
-#     err2.metric("Root Mean Squared Error", stats["rmse"])
-#     err3.metric("Mean Absolute % Error", f"{stats['mape']}%")
+#         col1, col2, col3 = st.columns(3)
 
+#         with col1:
+#             st.metric("Current Original", stats["curr_org"])
+#             st.markdown(
+#                 f"**Current Trend:** :{trend_color}[{stats['current_trend']}]"
+#             )
 
-def render_metrics(stats):
+#         with col2:
+#             st.metric("Current Predicted", stats["curr_val"])
+#             st.markdown(
+#                 f"**Predicted Trend:** :{pred_color}[{stats['pred_trend']}]"
+#             )
 
-    trend_color = "green" if stats["current_trend_up"] else "red"
-    pred_color = "green" if stats["pred_trend_up"] else "red"
-    similarity_color = "green" if stats["correct_pred"] == "Same" else "red"
+#         with col3:
+#             st.metric("Current Difference", stats["curr_diff"])
+#             st.markdown(
+#                 f"**Trend Similarity:** :{similarity_color}[{stats['correct_pred']}]"
+#             )
 
-    if stats["same_perc"] > 50:
-        perc_color = "green"
-    elif stats["same_perc"] < 50:
-        perc_color = "red"
-    else:
-        perc_color = "orange"
+#         st.markdown(
+#             f"**Similarity Percentage:** :{perc_color}[{stats['same_perc']}%]"
+#         )
 
-    with st.container(border=True):
+#         err1, err2, err3 = st.columns(3)
 
-        st.markdown(
-            """
-            <style>
-            div[data-testid="stVerticalBlockBorderWrapper"] {
-                background-color: #fff8ef;
-                border: 1px solid #f7941d;
-                border-radius: 8px;
-                padding: 10px 14px;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            st.metric("Current Original", stats["curr_org"])
-            st.markdown(
-                f"**Current Trend:** :{trend_color}[{stats['current_trend']}]"
-            )
-
-        with col2:
-            st.metric("Current Predicted", stats["curr_val"])
-            st.markdown(
-                f"**Predicted Trend:** :{pred_color}[{stats['pred_trend']}]"
-            )
-
-        with col3:
-            st.metric("Current Difference", stats["curr_diff"])
-            st.markdown(
-                f"**Trend Similarity:** :{similarity_color}[{stats['correct_pred']}]"
-            )
-
-        st.markdown(
-            f"**Similarity Percentage:** :{perc_color}[{stats['same_perc']}%]"
-        )
-
-        err1, err2, err3 = st.columns(3)
-
-        err1.metric("Mean Absolute Error", stats["mae"])
-        err2.metric("Root Mean Squared Error", stats["rmse"])
-        err3.metric(
-            "Mean Absolute % Error",
-            f"{stats['mape']}%"
-        )
+#         err1.metric("Mean Absolute Error", stats["mae"])
+#         err2.metric("Root Mean Squared Error", stats["rmse"])
+#         err3.metric(
+#             "Mean Absolute % Error",
+#             f"{stats['mape']}%"
+#         )
 
 
 def render_averages_chart():
