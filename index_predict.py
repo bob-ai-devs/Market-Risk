@@ -596,6 +596,8 @@ def main():
     col1, col2 = st.columns([4, 1])
     with col1:
         render_averages_chart()
+    with col2:
+        st.code()
     st.divider()
     render_table(merged_data)
 
