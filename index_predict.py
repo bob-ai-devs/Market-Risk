@@ -497,7 +497,7 @@ def main():
     st.markdown(
         """
         <div id="bob-banner">
-            <h1>📈 StockAlert \u2014 Nifty 50 Next-Close Predictor</h1>
+            <h1>🔮 StockAlert \u2014 Nifty 50 Next-Close Predictor</h1>
             <p>Live prediction dashboard  •  AI-powered market signals</p>
         </div>
         """,
