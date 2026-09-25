@@ -250,12 +250,15 @@ def update_rolling_averages(curr_org):
 def render_metrics(stats):
 
     # -----------------------------
-    # Colors
+    # Dynamic colors
     # -----------------------------
     trend_color = "#198754" if stats["current_trend_up"] else "#dc3545"
     pred_color = "#198754" if stats["pred_trend_up"] else "#dc3545"
+
     similarity_color = (
-        "#198754" if stats["correct_pred"] == "Same" else "#dc3545"
+        "#198754"
+        if stats["correct_pred"] == "Same"
+        else "#dc3545"
     )
 
     if stats["same_perc"] > 50:
@@ -265,135 +268,275 @@ def render_metrics(stats):
     else:
         perc_color = "#fd7e14"
 
-    # -----------------------------
-    # Metric Cards
-    # -----------------------------
     st.markdown(
         f"""
-        <style>
-        .metric-card-container {{
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 12px;
-        }}
+        <div style="
+            background-color:#fff8ef;
+            border:1px solid #f7941d;
+            border-radius:10px;
+            padding:16px;
+            margin-top:10px;
+            margin-bottom:10px;
+        ">
 
-        .metric-card {{
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 14px 16px;
-            border: 1px solid #e5e5e5;
-            border-left: 5px solid var(--card-color);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            min-height: 90px;
-        }}
+            <!-- ROW 1 -->
+            <div style="
+                display:flex;
+                gap:12px;
+                margin-bottom:12px;
+            ">
 
-        .metric-title {{
-            font-size: 14px;
-            font-weight: 600;
-            color: #555555;
-            margin-bottom: 7px;
-        }}
+                <!-- Current Original -->
+                <div style="
+                    flex:1;
+                    background:#ffffff;
+                    border-left:5px solid {trend_color};
+                    border-radius:10px;
+                    padding:14px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
+                ">
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#555;
+                        margin-bottom:6px;
+                    ">
+                        Current Original
+                    </div>
 
-        .metric-value {{
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--card-color);
-            line-height: 1.2;
-        }}
+                    <div style="
+                        font-size:25px;
+                        font-weight:700;
+                        color:{trend_color};
+                    ">
+                        {stats["curr_org"]}
+                    </div>
 
-        .metric-sub {{
-            font-size: 13px;
-            margin-top: 6px;
-            color: #555555;
-        }}
-
-        .metric-row {{
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 12px;
-        }}
-
-        @media (max-width: 768px) {{
-            .metric-card-container,
-            .metric-row {{
-                grid-template-columns: 1fr;
-            }}
-        }}
-        </style>
-
-        <!-- Current Metrics -->
-        <div class="metric-card-container">
-
-            <div class="metric-card" style="--card-color:{trend_color};">
-                <div class="metric-title">Current Original</div>
-                <div class="metric-value">{stats["curr_org"]}</div>
-                <div class="metric-sub">
-                    Current Trend:
-                    <b style="color:{trend_color};">
-                        {stats["current_trend"]}
-                    </b>
+                    <div style="
+                        font-size:13px;
+                        color:#555;
+                        margin-top:6px;
+                    ">
+                        Current Trend:
+                        <b style="color:{trend_color};">
+                            {stats["current_trend"]}
+                        </b>
+                    </div>
                 </div>
-            </div>
 
-            <div class="metric-card" style="--card-color:{pred_color};">
-                <div class="metric-title">Current Predicted</div>
-                <div class="metric-value">{stats["curr_val"]}</div>
-                <div class="metric-sub">
-                    Predicted Trend:
-                    <b style="color:{pred_color};">
-                        {stats["pred_trend"]}
-                    </b>
+
+                <!-- Current Predicted -->
+                <div style="
+                    flex:1;
+                    background:#ffffff;
+                    border-left:5px solid {pred_color};
+                    border-radius:10px;
+                    padding:14px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
+                ">
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#555;
+                        margin-bottom:6px;
+                    ">
+                        Current Predicted
+                    </div>
+
+                    <div style="
+                        font-size:25px;
+                        font-weight:700;
+                        color:{pred_color};
+                    ">
+                        {stats["curr_val"]}
+                    </div>
+
+                    <div style="
+                        font-size:13px;
+                        color:#555;
+                        margin-top:6px;
+                    ">
+                        Predicted Trend:
+                        <b style="color:{pred_color};">
+                            {stats["pred_trend"]}
+                        </b>
+                    </div>
                 </div>
-            </div>
 
-            <div class="metric-card" style="--card-color:{similarity_color};">
-                <div class="metric-title">Current Difference</div>
-                <div class="metric-value">{stats["curr_diff"]}</div>
-                <div class="metric-sub">
-                    Trend Similarity:
-                    <b style="color:{similarity_color};">
-                        {stats["correct_pred"]}
-                    </b>
+
+                <!-- Current Difference -->
+                <div style="
+                    flex:1;
+                    background:#ffffff;
+                    border-left:5px solid {similarity_color};
+                    border-radius:10px;
+                    padding:14px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
+                ">
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#555;
+                        margin-bottom:6px;
+                    ">
+                        Current Difference
+                    </div>
+
+                    <div style="
+                        font-size:25px;
+                        font-weight:700;
+                        color:{similarity_color};
+                    ">
+                        {stats["curr_diff"]}
+                    </div>
+
+                    <div style="
+                        font-size:13px;
+                        color:#555;
+                        margin-top:6px;
+                    ">
+                        Trend Similarity:
+                        <b style="color:{similarity_color};">
+                            {stats["correct_pred"]}
+                        </b>
+                    </div>
                 </div>
+
             </div>
 
-        </div>
 
-        <!-- Similarity -->
-        <div class="metric-row">
+            <!-- ROW 2 -->
+            <div style="
+                display:flex;
+                gap:12px;
+                margin-bottom:12px;
+            ">
 
-            <div class="metric-card" style="--card-color:{perc_color};">
-                <div class="metric-title">Similarity Percentage</div>
-                <div class="metric-value">{stats["same_perc"]}%</div>
+                <!-- Similarity Percentage -->
+                <div style="
+                    flex:1;
+                    background:#ffffff;
+                    border-left:5px solid {perc_color};
+                    border-radius:10px;
+                    padding:14px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
+                ">
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#555;
+                    ">
+                        Similarity Percentage
+                    </div>
+
+                    <div style="
+                        font-size:25px;
+                        font-weight:700;
+                        color:{perc_color};
+                        margin-top:6px;
+                    ">
+                        {stats["same_perc"]}%
+                    </div>
+                </div>
+
+
+                <!-- MAE -->
+                <div style="
+                    flex:1;
+                    background:#ffffff;
+                    border-left:5px solid #0059b3;
+                    border-radius:10px;
+                    padding:14px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
+                ">
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#555;
+                    ">
+                        Mean Absolute Error
+                    </div>
+
+                    <div style="
+                        font-size:25px;
+                        font-weight:700;
+                        color:#0059b3;
+                        margin-top:6px;
+                    ">
+                        {stats["mae"]}
+                    </div>
+                </div>
+
+
+                <!-- RMSE -->
+                <div style="
+                    flex:1;
+                    background:#ffffff;
+                    border-left:5px solid #6f42c1;
+                    border-radius:10px;
+                    padding:14px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
+                ">
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#555;
+                    ">
+                        Root Mean Squared Error
+                    </div>
+
+                    <div style="
+                        font-size:25px;
+                        font-weight:700;
+                        color:#6f42c1;
+                        margin-top:6px;
+                    ">
+                        {stats["rmse"]}
+                    </div>
+                </div>
+
             </div>
 
-            <div class="metric-card" style="--card-color:#0059b3;">
-                <div class="metric-title">Mean Absolute Error</div>
-                <div class="metric-value">{stats["mae"]}</div>
-            </div>
 
-            <div class="metric-card" style="--card-color:#6f42c1;">
-                <div class="metric-title">Root Mean Squared Error</div>
-                <div class="metric-value">{stats["rmse"]}</div>
-            </div>
+            <!-- ROW 3 -->
+            <div style="
+                display:flex;
+                gap:12px;
+            ">
 
-        </div>
+                <!-- MAPE -->
+                <div style="
+                    flex:1;
+                    background:#ffffff;
+                    border-left:5px solid #e67e22;
+                    border-radius:10px;
+                    padding:14px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
+                ">
+                    <div style="
+                        font-size:14px;
+                        font-weight:600;
+                        color:#555;
+                    ">
+                        Mean Absolute % Error
+                    </div>
 
-        <!-- MAPE -->
-        <div class="metric-row">
+                    <div style="
+                        font-size:25px;
+                        font-weight:700;
+                        color:#e67e22;
+                        margin-top:6px;
+                    ">
+                        {stats["mape"]}%
+                    </div>
+                </div>
 
-            <div class="metric-card" style="--card-color:#e67e22;">
-                <div class="metric-title">Mean Absolute % Error</div>
-                <div class="metric-value">{stats["mape"]}%</div>
             </div>
 
         </div>
         """,
         unsafe_allow_html=True
     )
-
 
 # def render_metrics(stats):
 
