@@ -316,17 +316,66 @@ def main():
         # )
         # st.markdown(METHODOLOGY_NOTE)
 
+        # Card CSS
         st.markdown(
-            """
-            <div class="metric-card" style="border-left:5px solid #e67e22;">
-                <div class="metric-title">Mean Absolute % Error</div>
-                <div class="metric-value" style="color:#e67e22;">
-                    Hi
-                </div>
-            </div>
+            f"""
+            <style>
+            .metric-card {{
+                background: #ffffff;
+                border-radius: 10px;
+                padding: 12px 16px;
+                margin-bottom: 10px;
+                border: 1px solid #e5e5e5;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            }}
+    
+            .metric-title {{
+                font-size: 14px;
+                font-weight: 600;
+                color: #555555;
+            }}
+    
+            .metric-value {{
+                font-size: 25px;
+                font-weight: 700;
+                margin-top: 5px;
+            }}
+    
+            .metric-sub {{
+                font-size: 13px;
+                color: #555555;
+                margin-top: 5px;
+            }}
+            </style>
             """,
             unsafe_allow_html=True
         )
+    
+        # ============================================================
+        # ROW 1
+        # ============================================================
+    
+        col1, col2, col3 = st.columns(3)
+    
+        with col1:
+            st.markdown(
+                f"""
+                <div class="metric-card" style="border-left:5px solid {trend_color};">
+                    <div class="metric-title">Current Original</div>
+                    <div class="metric-value" style="color:{trend_color};">
+                        {stats["curr_org"]}
+                    </div>
+                    <div class="metric-sub">
+                        Current Trend:
+                        <b style="color:{trend_color};">
+                            {stats["current_trend"]}
+                        </b>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
         
 
         # ============================================================
