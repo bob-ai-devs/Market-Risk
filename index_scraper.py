@@ -362,31 +362,6 @@ def main():
             unsafe_allow_html=True
         )
     
-        # ============================================================
-        # ROW 1
-        # ============================================================
-    
-        # col1, col2, col3 = st.columns(3)
-    
-        # with col1:
-        #     st.markdown(
-        #         f"""
-        #         <div class="metric-card" style="border-left:5px solid {trend_color};">
-        #             <div class="metric-title">Current Original</div>
-        #             <div class="metric-value" style="color:{trend_color};">
-        #                 Hi
-        #             </div>
-        #             <div class="metric-sub">
-        #                 Current Trend:
-        #                 <b style="color:{trend_color};">
-        #                     Hello
-        #                 </b>
-        #             </div>
-        #         </div>
-        #         """,
-        #         unsafe_allow_html=True
-        #     )
-
         
 
         # ============================================================
@@ -492,11 +467,9 @@ def main():
                     <div class="metric-title">
                         Rank for Holding
                     </div>
-        
                     <div class="metric-value" style="color:{holding_color};">
                         3M / 6M / 1Y
                     </div>
-        
                     <div class="metric-sub">
                         Dense ranks based on the respective
                         percentage change versus moving average.
@@ -516,11 +489,9 @@ def main():
                     <div class="metric-title">
                         Long Term Holding Rank
                     </div>
-        
                     <div class="metric-value" style="color:{longterm_color};">
                         2Y / 3Y
                     </div>
-        
                     <div class="metric-sub">
                         Dense ranks based on the respective
                         percentage change versus moving average.
@@ -540,11 +511,9 @@ def main():
                     <div class="metric-title">
                         Recent Performance Rank
                     </div>
-        
                     <div class="metric-value" style="color:{recent_color};">
                         Weighted Recent Performance
                     </div>
-        
                     <div class="metric-sub">
                         <b>Formula:</b>
                         <br>
@@ -572,11 +541,9 @@ def main():
                     <div class="metric-title">
                         Historical Performance Rank
                     </div>
-        
                     <div class="metric-value" style="color:{historical_color};">
                         Weighted Historical Performance
                     </div>
-        
                     <div class="metric-sub">
                         <b>Formula:</b>
                         <br>
@@ -598,11 +565,9 @@ def main():
                     <div class="metric-title">
                         Momentum View
                     </div>
-        
                     <div class="metric-value" style="color:{momentum_view_color};">
                         &lt;N&gt;DMoM
                     </div>
-        
                     <div class="metric-sub">
                         Momentum view columns represent the
                         volume-weighted rate-of-change calculated
@@ -621,11 +586,9 @@ def main():
                     <div class="metric-title">
                         Interpretation
                     </div>
-        
                     <div class="metric-value" style="color:{interpret_color};">
                         Price + Volume
                     </div>
-        
                     <div class="metric-sub">
                         Momentum combines price movement and
                         trading volume, giving greater influence
