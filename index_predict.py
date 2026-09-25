@@ -498,7 +498,7 @@ def render_averages_chart():
         )
 
     fig.update_layout(
-        title="Current value vs. rolling averages",
+        title=f"Current value vs. rolling averages (Cycle: {len(values)})",
         xaxis_title="Refresh cycle",
         yaxis_title="Average value",
         hovermode="x unified",
