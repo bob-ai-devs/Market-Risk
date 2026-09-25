@@ -406,39 +406,58 @@ def main():
             st.markdown(
                 f"""
                 <div class="metric-card" style="border-left:5px solid {momentum_color};">
-                    <div class="metric-title">
-                        20-Day Momentum
-                    </div>
-        
+                    <div class="metric-title">20-Day Momentum</div>
                     <div class="metric-value" style="color:{momentum_color};">
-                        Volume-Weighted ROC
+                        Hi
                     </div>
-        
                     <div class="metric-sub">
-                        Momentum calculated using price changes
-                        weighted by trading volume over the most
-                        recent 20 trading days.
+                        Volume-Weighted ROC
+                        <b style="color:{momentum_color};">
+                            Momentum calculated using price changes
+                            weighted by trading volume over the most
+                            recent 20 trading days.
+                        </b>
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
+            # st.markdown(
+            #     f"""
+            #     <div class="metric-card" style="border-left:5px solid {momentum_color};">
+            #         <div class="metric-title">
+            #             20-Day Momentum
+            #         </div>
         
-            # # Formula outside HTML so LaTeX renders correctly
-            # st.latex(
-            #     r"""
-            #     \text{Weighted ROC}_t^{(20)}
-            #     =
-            #     \frac{
-            #     \sum_{i=t-19}^{t}
-            #     \left(
-            #     \frac{P_i-P_{i-1}}{P_{i-1}}
-            #     \times V_i
-            #     \right)}
-            #     {\sum_{i=t-19}^{t}V_i}
-            #     \times100
-            #     """
+            #         <div class="metric-value" style="color:{momentum_color};">
+            #             Volume-Weighted ROC
+            #         </div>
+        
+            #         <div class="metric-sub">
+            #             Momentum calculated using price changes
+            #             weighted by trading volume over the most
+            #             recent 20 trading days.
+            #         </div>
+            #     </div>
+            #     """,
+            #     unsafe_allow_html=True
             # )
+        
+            # Formula outside HTML so LaTeX renders correctly
+            st.latex(
+                r"""
+                \text{Weighted ROC}_t^{(20)}
+                =
+                \frac{
+                \sum_{i=t-19}^{t}
+                \left(
+                \frac{P_i-P_{i-1}}{P_{i-1}}
+                \times V_i
+                \right)}
+                {\sum_{i=t-19}^{t}V_i}
+                \times100
+                """
+            )
         
         
         with col2:
