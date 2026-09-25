@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from google import genai
 import json
 import numpy as np
+from stock_analytics import text_to_html
 
 # ======================================================== # GEMINI CLIENT # ======================================================== 
 client = None 
@@ -386,7 +387,8 @@ def main():
             st.markdown(
                 f"**Model Used:** `{selected_model}`"
             )
-            st.write(st.session_state.analyzer_response)
+            # st.write(st.session_state.analyzer_response)
+            st.markdown(text_to_html(st.session_state.analyzer_response), unsafe_allow_html=True)
     
     # Show plots
     if selected_intervals:
