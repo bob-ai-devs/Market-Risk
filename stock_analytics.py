@@ -56,10 +56,6 @@ def safe_pct_change(new, old):
 # --------------------------------------------------------------------------
 
 
-import re
-import html as html_lib
-
-
 def text_to_html(text: str) -> str:
     """
     Robust Gemini Markdown/HTML renderer for Streamlit's st.markdown().
