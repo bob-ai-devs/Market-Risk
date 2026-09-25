@@ -366,26 +366,26 @@ def main():
         # ROW 1
         # ============================================================
     
-        col1, col2, col3 = st.columns(3)
+        # col1, col2, col3 = st.columns(3)
     
-        with col1:
-            st.markdown(
-                f"""
-                <div class="metric-card" style="border-left:5px solid {trend_color};">
-                    <div class="metric-title">Current Original</div>
-                    <div class="metric-value" style="color:{trend_color};">
-                        Hi
-                    </div>
-                    <div class="metric-sub">
-                        Current Trend:
-                        <b style="color:{trend_color};">
-                            Hello
-                        </b>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+        # with col1:
+        #     st.markdown(
+        #         f"""
+        #         <div class="metric-card" style="border-left:5px solid {trend_color};">
+        #             <div class="metric-title">Current Original</div>
+        #             <div class="metric-value" style="color:{trend_color};">
+        #                 Hi
+        #             </div>
+        #             <div class="metric-sub">
+        #                 Current Trend:
+        #                 <b style="color:{trend_color};">
+        #                     Hello
+        #                 </b>
+        #             </div>
+        #         </div>
+        #         """,
+        #         unsafe_allow_html=True
+        #     )
 
         
 
