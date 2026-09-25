@@ -617,52 +617,27 @@ def main():
             avg_total = st.session_state.avg_total[-1]
     
             def get_arrow(value):
-                return (
-                    up_arrow if value > curr
-                    else down_arrow if value < curr
-                    else equal_arrow
-                )
+                if value > curr:
+                    return up_arrow
+                elif value < curr:
+                    return down_arrow
+                else:
+                    return equal_arrow
     
-            st.markdown(
-                f"""
-                <div style="font-size:14px; line-height:1.9;">
-    
-                    <div style="color:lightblue;">
-                        <b>● Current: {curr:.2f}</b>
-                    </div>
-    
-                    <div style="color:green;">
-                        <b>● 30s: {avg_30s:.2f} {get_arrow(avg_30s)}</b>
-                    </div>
-    
-                    <div style="color:gold;">
-                        <b>● 1m: {avg_1m:.2f} {get_arrow(avg_1m)}</b>
-                    </div>
-    
-                    <div style="color:blue;">
-                        <b>● 2m: {avg_2m:.2f} {get_arrow(avg_2m)}</b>
-                    </div>
-    
-                    <div style="color:magenta;">
-                        <b>● 3m: {avg_3m:.2f} {get_arrow(avg_3m)}</b>
-                    </div>
-    
-                    <div style="color:deepskyblue;">
-                        <b>● 5m: {avg_5m:.2f} {get_arrow(avg_5m)}</b>
-                    </div>
-    
-                    <div style="color:red;">
-                        <b>● 10m: {avg_10m:.2f} {get_arrow(avg_10m)}</b>
-                    </div>
-    
-                    <div style="color:plum;">
-                        <b>● Total: {avg_total:.2f} {get_arrow(avg_total)}</b>
-                    </div>
-    
-                </div>
-                """,
-                unsafe_allow_html=True
+            html = (
+                f'<div style="font-size:14px; line-height:1.9;">'
+                f'<div style="color:lightblue;"><b>● Current: {curr:.2f}</b></div>'
+                f'<div style="color:green;"><b>● 30s: {avg_30s:.2f} {get_arrow(avg_30s)}</b></div>'
+                f'<div style="color:gold;"><b>● 1m: {avg_1m:.2f} {get_arrow(avg_1m)}</b></div>'
+                f'<div style="color:blue;"><b>● 2m: {avg_2m:.2f} {get_arrow(avg_2m)}</b></div>'
+                f'<div style="color:magenta;"><b>● 3m: {avg_3m:.2f} {get_arrow(avg_3m)}</b></div>'
+                f'<div style="color:deepskyblue;"><b>● 5m: {avg_5m:.2f} {get_arrow(avg_5m)}</b></div>'
+                f'<div style="color:red;"><b>● 10m: {avg_10m:.2f} {get_arrow(avg_10m)}</b></div>'
+                f'<div style="color:plum;"><b>● Total: {avg_total:.2f} {get_arrow(avg_total)}</b></div>'
+                f'</div>'
             )
+    
+            st.markdown(html, unsafe_allow_html=True)
     
     st.divider()
     render_table(merged_data)
