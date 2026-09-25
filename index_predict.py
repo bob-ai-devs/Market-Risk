@@ -466,61 +466,36 @@ def render_averages_chart():
 
     fig = go.Figure()
 
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_curr),
-        mode="lines",
-        name="Current",
-        line=dict(color="lightblue")
-    ))
+    series = [
+        ("Current", ss.avg_curr, "lightblue", "solid"),
+        ("30s", ss.avg_30s, "green", "dash"),
+        ("1m", ss.avg_1m, "gold", "dash"),
+        ("2m", ss.avg_2m, "blue", "dash"),
+        ("3m", ss.avg_3m, "magenta", "dash"),
+        ("5m", ss.avg_5m, "deepskyblue", "dash"),
+        ("10m", ss.avg_10m, "red", "dash"),
+        ("Total", ss.avg_total, "plum", "dash"),
+    ]
 
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_30s),
-        mode="lines",
-        name="30s",
-        line=dict(color="green", dash="dash")
-    ))
-
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_1m),
-        mode="lines",
-        name="1m",
-        line=dict(color="gold", dash="dash")
-    ))
-
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_2m),
-        mode="lines",
-        name="2m",
-        line=dict(color="blue", dash="dash")
-    ))
-
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_3m),
-        mode="lines",
-        name="3m",
-        line=dict(color="magenta", dash="dash")
-    ))
-
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_5m),
-        mode="lines",
-        name="5m",
-        line=dict(color="deepskyblue", dash="dash")
-    ))
-
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_10m),
-        mode="lines",
-        name="10m",
-        line=dict(color="red", dash="dash")
-    ))
-
-    fig.add_trace(go.Scatter(
-        y=list(ss.avg_total),
-        mode="lines",
-        name="Total",
-        line=dict(color="plum", dash="dash")
-    ))
+    for name, values, color, dash in series:
+        fig.add_trace(
+            go.Scatter(
+                x=list(range(1, len(values) + 1)),
+                y=list(values),
+                mode="lines",
+                name=name,
+                line=dict(
+                    color=color,
+                    dash=dash
+                ),
+                hovertemplate=(
+                    f"<b>{name}</b><br>"
+                    "Refresh cycle: %{x}<br>"
+                    "Value: %{y:.2f}"
+                    "<extra></extra>"
+                )
+            )
+        )
 
     fig.update_layout(
         title="Current value vs. rolling averages",
