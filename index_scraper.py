@@ -375,12 +375,12 @@ def main():
                 <div class="metric-card" style="border-left:5px solid {trend_color};">
                     <div class="metric-title">Current Original</div>
                     <div class="metric-value" style="color:{trend_color};">
-                        {stats["curr_org"]}
+                        Hi
                     </div>
                     <div class="metric-sub">
                         Current Trend:
                         <b style="color:{trend_color};">
-                            {stats["current_trend"]}
+                            Hello
                         </b>
                     </div>
                 </div>
