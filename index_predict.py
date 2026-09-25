@@ -363,7 +363,21 @@ def main():
 
     update_rolling_averages(stats["curr_org"])
 
-    render_metrics(stats)
+    st.markdown(
+        f"""
+        <div style="
+            background-color: #fff8ef;
+            border: 1px solid #f7941d;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #002e6e;
+        ">
+            {render_metrics(stats)}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    # render_metrics(stats)
     st.divider()
     render_averages_chart()
     st.divider()
