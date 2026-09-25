@@ -236,25 +236,36 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # Inject custom CSS to style the button
+    # Inject custom CSS only for the DIFF button
     st.markdown("""
         <style>
-        div.stButton > button {
+        div.diff-button button {
             background-color: #0066cc;
             color: white;
-            border-radius: 5px;
+            border-radius: 6px;
             border: none;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
         }
-        div.stButton > button:hover {
+    
+        div.diff-button button:hover {
             background-color: #0052a3;
             color: white;
+            border: none;
         }
-        div.stButton > button:active {
+    
+        div.diff-button button:active {
             background-color: #004080;
             color: white;
+            border: none;
         }
         </style>
     """, unsafe_allow_html=True)
+    
+    # DIFF button
+    st.markdown('<div class="diff-button">', unsafe_allow_html=True)
+    diff_clicked = st.button("🔍 Diff", key="diff_button")
+    st.markdown('</div>', unsafe_allow_html=True)
     
     selected_intervals = st.multiselect(
         "Select time periods to display:",
