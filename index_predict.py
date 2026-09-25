@@ -556,7 +556,7 @@ def main():
     st.sidebar.header("Settings")
     model_path = st.sidebar.text_input("Model path", value=DEFAULT_MODEL_PATH)
     refresh_seconds = st.sidebar.number_input(
-        "Auto-refresh interval (seconds)", min_value=10, max_value=3600, value=15, step=5
+        "Auto-refresh interval (seconds)", min_value=5, max_value=3600, value=10, step=5
     )
     auto_refresh = st.sidebar.checkbox("Enable auto-refresh", value=True)
     if st.sidebar.button("Refresh now"):
