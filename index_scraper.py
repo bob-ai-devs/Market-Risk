@@ -315,137 +315,60 @@ def main():
         #     r"{\sum_{i=t-19}^{t} V_i}\times 100$$"
         # )
         # st.markdown(METHODOLOGY_NOTE)
+        
+
+        # Header
+        st.markdown("### 📊 20-Day Momentum Methodology")
+    
+        # Formula section
+        st.markdown("**20-Day Momentum (volume-weighted ROC):**")
+    
+        st.latex(
+            r"""
+            \text{Weighted ROC}_t^{(20)}
+            =
+            \frac{
+                \sum_{i=t-19}^{t}
+                \left(
+                    \frac{P_i-P_{i-1}}{P_{i-1}}
+                    \times V_i
+                \right)
+            }{
+                \sum_{i=t-19}^{t} V_i
+            }
+            \times 100
+            """
+        )
+    
+        # Methodology notes
+        st.markdown("### 📌 Methodology Notes")
+    
         st.markdown(
             """
-            <div style="
-                background-color:#fff8ef;
-                border:1px solid #f7941d;
-                border-radius:10px;
-                padding:16px 20px;
-                margin-top:10px;
-                margin-bottom:15px;
-                box-shadow:0 2px 6px rgba(0,0,0,0.08);
-            ">
-        
-                <div style="
-                    font-size:18px;
-                    font-weight:700;
-                    color:#002e6e;
-                    margin-bottom:12px;
-                ">
-                    📊 20-Day Momentum Methodology
-                </div>
-        
-                <div style="
-                    background:#ffffff;
-                    border-left:5px solid #f7941d;
-                    border-radius:8px;
-                    padding:12px 16px;
-                    margin-bottom:14px;
-                    color:#002e6e;
-                    font-size:15px;
-                ">
-                    <b>20-Day Momentum (volume-weighted ROC)</b>
-                </div>
-        
-                <div style="
-                    background:#ffffff;
-                    border:1px solid #eeeeee;
-                    border-radius:8px;
-                    padding:14px;
-                    text-align:center;
-                    margin-bottom:16px;
-                    overflow-x:auto;
-                ">
-        
-                    <div style="
-                        font-size:17px;
-                        font-weight:600;
-                        color:#002e6e;
-                        margin-bottom:8px;
-                    ">
-                        Weighted ROC
-                    </div>
-        
-                    <div style="
-                        font-size:20px;
-                        color:#002e6e;
-                        font-family:serif;
-                        padding:8px;
-                    ">
-                        Σ&nbsp;&nbsp;((Pᵢ − Pᵢ₋₁) / Pᵢ₋₁ × Vᵢ)
-                        &nbsp;&nbsp;÷&nbsp;&nbsp;
-                        Σ&nbsp;Vᵢ
-                        &nbsp;&nbsp;×&nbsp;&nbsp;100
-                    </div>
-        
-                    <div style="
-                        font-size:13px;
-                        color:#666666;
-                        margin-top:6px;
-                    ">
-                        over the most recent 20 trading days
-                    </div>
-        
-                </div>
-        
-                <div style="
-                    font-size:17px;
-                    font-weight:700;
-                    color:#002e6e;
-                    margin-bottom:8px;
-                ">
-                    📌 Methodology Notes
-                </div>
-        
-                <div style="
-                    background:#ffffff;
-                    border-radius:8px;
-                    padding:14px 18px;
-                    color:#333333;
-                    font-size:14px;
-                    line-height:1.6;
-                ">
-        
-                    <div style="margin-bottom:8px;">
-                        <b style="color:#002e6e;">% Change &lt;N&gt;DMA</b>:
-                        how far the current price sits above or below its N-day
-                        moving average.
-                    </div>
-        
-                    <div style="margin-bottom:8px;">
-                        <b style="color:#002e6e;">Rank for Selling (1M)</b> /
-                        <b style="color:#002e6e;">Rank for Holding (3M/6M/1Y)</b> /
-                        <b style="color:#002e6e;">Rank for Long Term Holding (2Y/3Y)</b>:
-                        dense ranks (1 = strongest) of stocks by their respective
-                        % change versus moving average.
-                    </div>
-        
-                    <div style="margin-bottom:8px;">
-                        <b style="color:#002e6e;">Recent Performance Rank</b> =
-                        3×(1Y rank) + 2×(2Y rank) + 1×(3Y rank);
-                        lower is better.
-                    </div>
-        
-                    <div style="margin-bottom:8px;">
-                        <b style="color:#002e6e;">Historical Performance Rank</b> =
-                        1×(1Y rank) + 2×(2Y rank) + 3×(3Y rank);
-                        lower is better.
-                    </div>
-        
-                    <div>
-                        <b style="color:#002e6e;">Momentum view columns
-                        (&lt;N&gt;DMoM)</b>:
-                        volume-weighted rate-of-change over N days.
-                    </div>
-        
-                </div>
-        
-            </div>
-            """,
-            unsafe_allow_html=True
+            **Key columns:**
+    
+            - **% Change <N>DMA:** how far the current price sits above/below its N-day moving average.
+    
+            - **Rank for Selling (1M)** / **Rank for Holding (3M/6M/1Y)** /
+              **Rank for Long Term Holding (2Y/3Y):**
+              dense ranks (1 = strongest) of stocks by their respective
+              %-change-vs-moving-average.
+    
+            - **Recent Performance Rank:**
+              `3 × (1Y rank) + 2 × (2Y rank) + 1 × (3Y rank)`;
+              lower is better.
+    
+            - **Historical Performance Rank:**
+              `1 × (1Y rank) + 2 × (2Y rank) + 3 × (3Y rank)`;
+              lower is better.
+    
+            - **Momentum view columns (<N>DMoM):**
+              volume-weighted rate-of-change over N days.
+            """
         )
 
+
+    
     # ---- Selection controls -------------------------------------------------
     col1, col2 = st.columns(2)
     with col1:
