@@ -631,6 +631,8 @@ def main():
     with col4:
         display_options = CATEGORY_DISPLAY_NAMES[category]
         display_name = st.selectbox("Choose an index", options=display_options)
+        if display_name != st.session_state.display_name:
+            st.session_state["final_df"] = pd.DataFrame()
         st.session_state.display_name = display_name
 
     col5, col6 = st.columns(2)
