@@ -424,21 +424,21 @@ def main():
                 unsafe_allow_html=True
             )
         
-            # Formula outside HTML so LaTeX renders correctly
-            st.latex(
-                r"""
-                \text{Weighted ROC}_t^{(20)}
-                =
-                \frac{
-                \sum_{i=t-19}^{t}
-                \left(
-                \frac{P_i-P_{i-1}}{P_{i-1}}
-                \times V_i
-                \right)}
-                {\sum_{i=t-19}^{t}V_i}
-                \times100
-                """
-            )
+            # # Formula outside HTML so LaTeX renders correctly
+            # st.latex(
+            #     r"""
+            #     \text{Weighted ROC}_t^{(20)}
+            #     =
+            #     \frac{
+            #     \sum_{i=t-19}^{t}
+            #     \left(
+            #     \frac{P_i-P_{i-1}}{P_{i-1}}
+            #     \times V_i
+            #     \right)}
+            #     {\sum_{i=t-19}^{t}V_i}
+            #     \times100
+            #     """
+            # )
         
         
         with col2:
