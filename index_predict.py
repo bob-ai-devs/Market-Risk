@@ -477,7 +477,7 @@ def render_table(merged_data: pd.DataFrame):
 # --------------------------------------------------------------------------- #
 
 def main():
-    st.set_page_config(page_title="StockAlert - Nifty 50 Predictor", page_icon="🔮", layout="wide")
+    st.set_page_config(page_title="StockAlert", page_icon="🔮", layout="wide")
     init_session_state()
 
     st.sidebar.header("Settings")
