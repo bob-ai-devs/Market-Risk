@@ -249,12 +249,8 @@ def update_rolling_averages(curr_org):
 
 def render_metrics(stats):
 
-    # -----------------------------
-    # Dynamic colors
-    # -----------------------------
     trend_color = "#198754" if stats["current_trend_up"] else "#dc3545"
     pred_color = "#198754" if stats["pred_trend_up"] else "#dc3545"
-
     similarity_color = (
         "#198754"
         if stats["correct_pred"] == "Same"
@@ -268,275 +264,170 @@ def render_metrics(stats):
     else:
         perc_color = "#fd7e14"
 
+    # Card CSS
     st.markdown(
         f"""
-        <div style="
-            background-color:#fff8ef;
-            border:1px solid #f7941d;
-            border-radius:10px;
-            padding:16px;
-            margin-top:10px;
-            margin-bottom:10px;
-        ">
+        <style>
+        .metric-card {{
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border: 1px solid #e5e5e5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }}
 
-            <!-- ROW 1 -->
-            <div style="
-                display:flex;
-                gap:12px;
-                margin-bottom:12px;
-            ">
+        .metric-title {{
+            font-size: 14px;
+            font-weight: 600;
+            color: #555555;
+        }}
 
-                <!-- Current Original -->
-                <div style="
-                    flex:1;
-                    background:#ffffff;
-                    border-left:5px solid {trend_color};
-                    border-radius:10px;
-                    padding:14px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
-                ">
-                    <div style="
-                        font-size:14px;
-                        font-weight:600;
-                        color:#555;
-                        margin-bottom:6px;
-                    ">
-                        Current Original
-                    </div>
+        .metric-value {{
+            font-size: 25px;
+            font-weight: 700;
+            margin-top: 5px;
+        }}
 
-                    <div style="
-                        font-size:25px;
-                        font-weight:700;
-                        color:{trend_color};
-                    ">
-                        {stats["curr_org"]}
-                    </div>
-
-                    <div style="
-                        font-size:13px;
-                        color:#555;
-                        margin-top:6px;
-                    ">
-                        Current Trend:
-                        <b style="color:{trend_color};">
-                            {stats["current_trend"]}
-                        </b>
-                    </div>
-                </div>
-
-
-                <!-- Current Predicted -->
-                <div style="
-                    flex:1;
-                    background:#ffffff;
-                    border-left:5px solid {pred_color};
-                    border-radius:10px;
-                    padding:14px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
-                ">
-                    <div style="
-                        font-size:14px;
-                        font-weight:600;
-                        color:#555;
-                        margin-bottom:6px;
-                    ">
-                        Current Predicted
-                    </div>
-
-                    <div style="
-                        font-size:25px;
-                        font-weight:700;
-                        color:{pred_color};
-                    ">
-                        {stats["curr_val"]}
-                    </div>
-
-                    <div style="
-                        font-size:13px;
-                        color:#555;
-                        margin-top:6px;
-                    ">
-                        Predicted Trend:
-                        <b style="color:{pred_color};">
-                            {stats["pred_trend"]}
-                        </b>
-                    </div>
-                </div>
-
-
-                <!-- Current Difference -->
-                <div style="
-                    flex:1;
-                    background:#ffffff;
-                    border-left:5px solid {similarity_color};
-                    border-radius:10px;
-                    padding:14px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
-                ">
-                    <div style="
-                        font-size:14px;
-                        font-weight:600;
-                        color:#555;
-                        margin-bottom:6px;
-                    ">
-                        Current Difference
-                    </div>
-
-                    <div style="
-                        font-size:25px;
-                        font-weight:700;
-                        color:{similarity_color};
-                    ">
-                        {stats["curr_diff"]}
-                    </div>
-
-                    <div style="
-                        font-size:13px;
-                        color:#555;
-                        margin-top:6px;
-                    ">
-                        Trend Similarity:
-                        <b style="color:{similarity_color};">
-                            {stats["correct_pred"]}
-                        </b>
-                    </div>
-                </div>
-
-            </div>
-
-
-            <!-- ROW 2 -->
-            <div style="
-                display:flex;
-                gap:12px;
-                margin-bottom:12px;
-            ">
-
-                <!-- Similarity Percentage -->
-                <div style="
-                    flex:1;
-                    background:#ffffff;
-                    border-left:5px solid {perc_color};
-                    border-radius:10px;
-                    padding:14px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
-                ">
-                    <div style="
-                        font-size:14px;
-                        font-weight:600;
-                        color:#555;
-                    ">
-                        Similarity Percentage
-                    </div>
-
-                    <div style="
-                        font-size:25px;
-                        font-weight:700;
-                        color:{perc_color};
-                        margin-top:6px;
-                    ">
-                        {stats["same_perc"]}%
-                    </div>
-                </div>
-
-
-                <!-- MAE -->
-                <div style="
-                    flex:1;
-                    background:#ffffff;
-                    border-left:5px solid #0059b3;
-                    border-radius:10px;
-                    padding:14px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
-                ">
-                    <div style="
-                        font-size:14px;
-                        font-weight:600;
-                        color:#555;
-                    ">
-                        Mean Absolute Error
-                    </div>
-
-                    <div style="
-                        font-size:25px;
-                        font-weight:700;
-                        color:#0059b3;
-                        margin-top:6px;
-                    ">
-                        {stats["mae"]}
-                    </div>
-                </div>
-
-
-                <!-- RMSE -->
-                <div style="
-                    flex:1;
-                    background:#ffffff;
-                    border-left:5px solid #6f42c1;
-                    border-radius:10px;
-                    padding:14px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
-                ">
-                    <div style="
-                        font-size:14px;
-                        font-weight:600;
-                        color:#555;
-                    ">
-                        Root Mean Squared Error
-                    </div>
-
-                    <div style="
-                        font-size:25px;
-                        font-weight:700;
-                        color:#6f42c1;
-                        margin-top:6px;
-                    ">
-                        {stats["rmse"]}
-                    </div>
-                </div>
-
-            </div>
-
-
-            <!-- ROW 3 -->
-            <div style="
-                display:flex;
-                gap:12px;
-            ">
-
-                <!-- MAPE -->
-                <div style="
-                    flex:1;
-                    background:#ffffff;
-                    border-left:5px solid #e67e22;
-                    border-radius:10px;
-                    padding:14px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.10);
-                ">
-                    <div style="
-                        font-size:14px;
-                        font-weight:600;
-                        color:#555;
-                    ">
-                        Mean Absolute % Error
-                    </div>
-
-                    <div style="
-                        font-size:25px;
-                        font-weight:700;
-                        color:#e67e22;
-                        margin-top:6px;
-                    ">
-                        {stats["mape"]}%
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
+        .metric-sub {{
+            font-size: 13px;
+            color: #555555;
+            margin-top: 5px;
+        }}
+        </style>
         """,
         unsafe_allow_html=True
     )
+
+    # ============================================================
+    # ROW 1
+    # ============================================================
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown(
+            f"""
+            <div class="metric-card" style="border-left:5px solid {trend_color};">
+                <div class="metric-title">Current Original</div>
+                <div class="metric-value" style="color:{trend_color};">
+                    {stats["curr_org"]}
+                </div>
+                <div class="metric-sub">
+                    Current Trend:
+                    <b style="color:{trend_color};">
+                        {stats["current_trend"]}
+                    </b>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col2:
+        st.markdown(
+            f"""
+            <div class="metric-card" style="border-left:5px solid {pred_color};">
+                <div class="metric-title">Current Predicted</div>
+                <div class="metric-value" style="color:{pred_color};">
+                    {stats["curr_val"]}
+                </div>
+                <div class="metric-sub">
+                    Predicted Trend:
+                    <b style="color:{pred_color};">
+                        {stats["pred_trend"]}
+                    </b>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col3:
+        st.markdown(
+            f"""
+            <div class="metric-card" style="border-left:5px solid {similarity_color};">
+                <div class="metric-title">Current Difference</div>
+                <div class="metric-value" style="color:{similarity_color};">
+                    {stats["curr_diff"]}
+                </div>
+                <div class="metric-sub">
+                    Trend Similarity:
+                    <b style="color:{similarity_color};">
+                        {stats["correct_pred"]}
+                    </b>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ============================================================
+    # ROW 2
+    # ============================================================
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown(
+            f"""
+            <div class="metric-card" style="border-left:5px solid {perc_color};">
+                <div class="metric-title">Similarity Percentage</div>
+                <div class="metric-value" style="color:{perc_color};">
+                    {stats["same_perc"]}%
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col2:
+        st.markdown(
+            """
+            <div class="metric-card" style="border-left:5px solid #0059b3;">
+                <div class="metric-title">Mean Absolute Error</div>
+                <div class="metric-value" style="color:#0059b3;">
+                    """ + str(stats["mae"]) + """
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col3:
+        st.markdown(
+            """
+            <div class="metric-card" style="border-left:5px solid #6f42c1;">
+                <div class="metric-title">Root Mean Squared Error</div>
+                <div class="metric-value" style="color:#6f42c1;">
+                    """ + str(stats["rmse"]) + """
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ============================================================
+    # ROW 3
+    # ============================================================
+
+    col1, _, _ = st.columns(3)
+
+    with col1:
+        st.markdown(
+            """
+            <div class="metric-card" style="border-left:5px solid #e67e22;">
+                <div class="metric-title">Mean Absolute % Error</div>
+                <div class="metric-value" style="color:#e67e22;">
+                    """ + str(stats["mape"]) + """%
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+
 
 # def render_metrics(stats):
 
