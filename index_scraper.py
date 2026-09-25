@@ -321,7 +321,7 @@ def main():
             <div class="metric-card" style="border-left:5px solid #e67e22;">
                 <div class="metric-title">Mean Absolute % Error</div>
                 <div class="metric-value" style="color:#e67e22;">
-                    """ Hi """%
+                    Hi
                 </div>
             </div>
             """,
