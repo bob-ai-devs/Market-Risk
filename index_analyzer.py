@@ -262,6 +262,19 @@ def main():
     st.markdown('<div class="refresh-button">', unsafe_allow_html=True)
     refresh_clicked = st.button("🔄 Refresh Data", key="refresh_data_button")
     st.markdown('</div>', unsafe_allow_html=True)
+
+    if refresh_clicked:
+        with st.spinner("Fetching NSE index data..."):
+            st.session_state.change_df = fetch_change_data()
+            st.session_state.analyzer_response = None
+
+        # change_df = st.session_state.change_df
+        
+        # Sort by '1D' column ascending
+        change_df = st.session_state.change_df.sort_values(
+            by='1D',
+            ascending=False
+        )
     
     selected_intervals = st.multiselect(
         "Select time periods to display:",
