@@ -515,7 +515,7 @@ def render_averages_chart():
 
     fig.update_xaxes(
         showgrid=True,
-        rangeslider=dict(visible=True)
+        # rangeslider=dict(visible=True)
     )
 
     fig.update_yaxes(
