@@ -236,35 +236,31 @@ def main():
         unsafe_allow_html=True,
     )
 
-    # Inject custom CSS only for the DIFF button
+    # Inject custom CSS only for the Refresh button
     st.markdown("""
         <style>
-        div.diff-button button {
+        div.refresh-button button {
             background-color: #0066cc;
             color: white;
             border-radius: 6px;
             border: none;
             font-weight: 600;
-            padding: 0.4rem 1rem;
         }
     
-        div.diff-button button:hover {
+        div.refresh-button button:hover {
             background-color: #0052a3;
             color: white;
-            border: none;
         }
     
-        div.diff-button button:active {
+        div.refresh-button button:active {
             background-color: #004080;
             color: white;
-            border: none;
         }
         </style>
     """, unsafe_allow_html=True)
     
-    # DIFF button
-    st.markdown('<div class="diff-button">', unsafe_allow_html=True)
-    diff_clicked = st.button("🔍 Diff", key="diff_button")
+    st.markdown('<div class="refresh-button">', unsafe_allow_html=True)
+    refresh_clicked = st.button("🔄 Refresh Data", key="refresh_data_button")
     st.markdown('</div>', unsafe_allow_html=True)
     
     selected_intervals = st.multiselect(
