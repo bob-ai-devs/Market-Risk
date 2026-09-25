@@ -591,28 +591,79 @@ def main():
 
     update_rolling_averages(stats["curr_org"])
 
+    up_arrow = "\u2191"      # ↑
+    down_arrow = "\u2193"    # ↓
+    equal_arrow = "\u2194"   # ↔
+    
     render_metrics(stats)
     st.divider()
+    
     col1, col2 = st.columns([4, 1])
+    
     with col1:
         render_averages_chart()
+    
     with col2:
         with st.container(border=True):
+    
+            curr = st.session_state.avg_curr[-1]
+    
+            avg_30s = st.session_state.avg_30s[-1]
+            avg_1m = st.session_state.avg_1m[-1]
+            avg_2m = st.session_state.avg_2m[-1]
+            avg_3m = st.session_state.avg_3m[-1]
+            avg_5m = st.session_state.avg_5m[-1]
+            avg_10m = st.session_state.avg_10m[-1]
+            avg_total = st.session_state.avg_total[-1]
+    
+            def get_arrow(value):
+                return (
+                    up_arrow if value > curr
+                    else down_arrow if value < curr
+                    else equal_arrow
+                )
+    
             st.markdown(
                 f"""
-                <div style="font-size:14px; line-height:1.8;">
-                    <div style="color:lightblue;"><b>● Current: {st.session_state.avg_curr[-1]:.2f}</b></div>
-                    <div style="color:green;"><b>● 30s: {st.session_state.avg_30s[-1]:.2f}</b></div>
-                    <div style="color:gold;"><b>● 1m: {st.session_state.avg_1m[-1]:.2f}</b></div>
-                    <div style="color:blue;"><b>● 2m: {st.session_state.avg_2m[-1]:.2f}</b></div>
-                    <div style="color:magenta;"><b>● 3m: {st.session_state.avg_3m[-1]:.2f}</b></div>
-                    <div style="color:deepskyblue;"><b>● 5m: {st.session_state.avg_5m[-1]:.2f}</b></div>
-                    <div style="color:red;"><b>● 10m: {st.session_state.avg_10m[-1]:.2f}</b></div>
-                    <div style="color:plum;"><b>● Total: {st.session_state.avg_total[-1]:.2f}</b></div>
+                <div style="font-size:14px; line-height:1.9;">
+    
+                    <div style="color:lightblue;">
+                        <b>● Current: {curr:.2f}</b>
+                    </div>
+    
+                    <div style="color:green;">
+                        <b>● 30s: {avg_30s:.2f} {get_arrow(avg_30s)}</b>
+                    </div>
+    
+                    <div style="color:gold;">
+                        <b>● 1m: {avg_1m:.2f} {get_arrow(avg_1m)}</b>
+                    </div>
+    
+                    <div style="color:blue;">
+                        <b>● 2m: {avg_2m:.2f} {get_arrow(avg_2m)}</b>
+                    </div>
+    
+                    <div style="color:magenta;">
+                        <b>● 3m: {avg_3m:.2f} {get_arrow(avg_3m)}</b>
+                    </div>
+    
+                    <div style="color:deepskyblue;">
+                        <b>● 5m: {avg_5m:.2f} {get_arrow(avg_5m)}</b>
+                    </div>
+    
+                    <div style="color:red;">
+                        <b>● 10m: {avg_10m:.2f} {get_arrow(avg_10m)}</b>
+                    </div>
+    
+                    <div style="color:plum;">
+                        <b>● Total: {avg_total:.2f} {get_arrow(avg_total)}</b>
+                    </div>
+    
                 </div>
                 """,
                 unsafe_allow_html=True
             )
+    
     st.divider()
     render_table(merged_data)
 
