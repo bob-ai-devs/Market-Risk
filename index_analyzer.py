@@ -270,12 +270,6 @@ def main():
             st.session_state.analyzer_response = None
 
     
-    selected_intervals = st.multiselect(
-        "Select time periods to display:",
-        options=list(interval_config.keys()),
-        default=["1D"]
-    )
-    
     # Show raw table
     with st.expander("📋 View Raw % Change Table"):
         # Clamp values between -100 and 100 for gradient mapping
@@ -389,6 +383,14 @@ def main():
             )
             # st.write(st.session_state.analyzer_response)
             st.markdown(text_to_html(st.session_state.analyzer_response), unsafe_allow_html=True)
+    
+    
+    selected_intervals = st.multiselect(
+        "Select time periods to display:",
+        options=list(interval_config.keys()),
+        default=["1D"]
+    )
+    
     
     # Show plots
     if selected_intervals:
