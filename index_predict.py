@@ -593,7 +593,9 @@ def main():
 
     render_metrics(stats)
     st.divider()
-    render_averages_chart()
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        render_averages_chart()
     st.divider()
     render_table(merged_data)
 
