@@ -383,10 +383,9 @@ def main():
                 <div class="metric-card" style="border-left:5px solid {momentum_color};">
                     <div class="metric-title">20-Day Momentum</div>
                     <div class="metric-value" style="color:{momentum_color};">
-                        Hi
+                        Volume-Weighted ROC
                     </div>
                     <div class="metric-sub">
-                        Volume-Weighted ROC:
                         Momentum calculated using price changes
                         weighted by trading volume over the most
                         recent 20 trading days.
