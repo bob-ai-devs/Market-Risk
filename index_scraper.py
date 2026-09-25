@@ -317,55 +317,153 @@ def main():
         # st.markdown(METHODOLOGY_NOTE)
         
 
-        # Header
         st.markdown("### 📊 20-Day Momentum Methodology")
-    
-        # Formula section
-        st.markdown("**20-Day Momentum (volume-weighted ROC):**")
-    
-        st.latex(
-            r"""
-            \text{Weighted ROC}_t^{(20)}
-            =
-            \frac{
-                \sum_{i=t-19}^{t}
-                \left(
-                    \frac{P_i-P_{i-1}}{P_{i-1}}
-                    \times V_i
-                \right)
-            }{
-                \sum_{i=t-19}^{t} V_i
-            }
-            \times 100
-            """
-        )
-    
-        # Methodology notes
-        st.markdown("### 📌 Methodology Notes")
-    
-        st.markdown(
-            """
-            **Key columns:**
-    
-            - **% Change <N>DMA:** how far the current price sits above/below its N-day moving average.
-    
-            - **Rank for Selling (1M)** / **Rank for Holding (3M/6M/1Y)** /
-              **Rank for Long Term Holding (2Y/3Y):**
-              dense ranks (1 = strongest) of stocks by their respective
-              %-change-vs-moving-average.
-    
-            - **Recent Performance Rank:**
-              `3 × (1Y rank) + 2 × (2Y rank) + 1 × (3Y rank)`;
-              lower is better.
-    
-            - **Historical Performance Rank:**
-              `1 × (1Y rank) + 2 × (2Y rank) + 3 × (3Y rank)`;
-              lower is better.
-    
-            - **Momentum view columns (<N>DMoM):**
-              volume-weighted rate-of-change over N days.
-            """
-        )
+
+        # ============================================================
+        # ROW 1
+        # ============================================================
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            with st.container(border=True):
+                st.markdown("#### 📈 20-Day Momentum")
+                st.markdown("**Volume-weighted ROC**")
+                st.latex(
+                    r"""
+                    \text{Weighted ROC}_t^{(20)}
+                    =
+                    \frac{
+                        \sum_{i=t-19}^{t}
+                        \left(
+                            \frac{P_i-P_{i-1}}{P_{i-1}}
+                            \times V_i
+                        \right)
+                    }{
+                        \sum_{i=t-19}^{t} V_i
+                    }
+                    \times 100
+                    """
+                )
+        
+        with col2:
+            with st.container(border=True):
+                st.markdown("#### 📊 % Change <N>DMA")
+                st.markdown(
+                    """
+                    Shows how far the **current price** sits
+                    above or below its **N-day moving average**.
+                    """
+                )
+        
+        with col3:
+            with st.container(border=True):
+                st.markdown("#### 🏆 Rank for Selling (1M)")
+                st.markdown(
+                    """
+                    Dense rank of stocks based on their
+                    **% change versus the moving average**.
+        
+                    **Rank 1 = strongest**
+                    """
+                )
+        
+        
+        # ============================================================
+        # ROW 2
+        # ============================================================
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            with st.container(border=True):
+                st.markdown("#### 📌 Rank for Holding")
+                st.markdown(
+                    """
+                    Applies to:
+        
+                    **3M / 6M / 1Y**
+        
+                    Dense ranking based on the respective
+                    **% change versus moving average**.
+        
+                    **Rank 1 = strongest**
+                    """
+                )
+        
+        with col2:
+            with st.container(border=True):
+                st.markdown("#### 🏅 Long Term Holding Rank")
+                st.markdown(
+                    """
+                    Applies to:
+        
+                    **2Y / 3Y**
+        
+                    Dense ranking based on the respective
+                    **% change versus moving average**.
+        
+                    **Rank 1 = strongest**
+                    """
+                )
+        
+        with col3:
+            with st.container(border=True):
+                st.markdown("#### 🚀 Recent Performance Rank")
+                st.markdown(
+                    """
+                    **Formula:**
+        
+                    `3 × (1Y rank) + 2 × (2Y rank) + 1 × (3Y rank)`
+        
+                    **Lower rank = better**
+                    """
+                )
+        
+        
+        # ============================================================
+        # ROW 3
+        # ============================================================
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            with st.container(border=True):
+                st.markdown("#### 📚 Historical Performance Rank")
+                st.markdown(
+                    """
+                    **Formula:**
+        
+                    `1 × (1Y rank) + 2 × (2Y rank) + 3 × (3Y rank)`
+        
+                    **Lower rank = better**
+                    """
+                )
+        
+        with col2:
+            with st.container(border=True):
+                st.markdown("#### ⚡ Momentum View")
+                st.markdown(
+                    """
+                    Columns such as:
+        
+                    **<N>DMoM**
+        
+                    represent the **volume-weighted rate-of-change**
+                    calculated over **N days**.
+                    """
+                )
+        
+        with col3:
+            with st.container(border=True):
+                st.markdown("#### 📖 Interpretation")
+                st.markdown(
+                    """
+                    Momentum combines **price movement and trading
+                    volume**, giving greater weight to price changes
+                    occurring with higher volume.
+                    """
+                )
 
 
     
