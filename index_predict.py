@@ -598,16 +598,16 @@ def main():
         render_averages_chart()
     with col2:
         st.markdown(
-            """
+            f"""
             <div style="font-size:14px; line-height:1.8;">
-                <div style="color:lightblue;"><b>● Current</b></div>
-                <div style="color:green;"><b>● 30s</b></div>
-                <div style="color:gold;"><b>● 1m</b></div>
-                <div style="color:blue;"><b>● 2m</b></div>
-                <div style="color:magenta;"><b>● 3m</b></div>
-                <div style="color:deepskyblue;"><b>● 5m</b></div>
-                <div style="color:red;"><b>● 10m</b></div>
-                <div style="color:plum;"><b>● Total</b></div>
+                <div style="color:lightblue;"><b>● Current: {st.session_state.avg_curr[-1]:.2f}</b></div>
+                <div style="color:green;"><b>● 30s: {st.session_state.avg_30s[-1]:.2f}</b></div>
+                <div style="color:gold;"><b>● 1m: {st.session_state.avg_1m[-1]:.2f}</b></div>
+                <div style="color:blue;"><b>● 2m: {st.session_state.avg_2m[-1]:.2f}</b></div>
+                <div style="color:magenta;"><b>● 3m: {st.session_state.avg_3m[-1]:.2f}</b></div>
+                <div style="color:deepskyblue;"><b>● 5m: {st.session_state.avg_5m[-1]:.2f}</b></div>
+                <div style="color:red;"><b>● 10m: {st.session_state.avg_10m[-1]:.2f}</b></div>
+                <div style="color:plum;"><b>● Total: {st.session_state.avg_total[-1]:.2f}</b></div>
             </div>
             """,
             unsafe_allow_html=True
