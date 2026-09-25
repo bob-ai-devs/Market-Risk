@@ -463,11 +463,9 @@ def main():
                     <div class="metric-title">
                         Rank for Selling (1M)
                     </div>
-        
                     <div class="metric-value" style="color:{selling_color};">
                         Dense Rank
                     </div>
-        
                     <div class="metric-sub">
                         Dense ranking of stocks based on their
                         respective percentage change versus the
