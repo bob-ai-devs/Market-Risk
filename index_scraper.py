@@ -411,37 +411,15 @@ def main():
                         Hi
                     </div>
                     <div class="metric-sub">
-                        Volume-Weighted ROC
-                        <b style="color:{momentum_color};">
-                            Momentum calculated using price changes
-                            weighted by trading volume over the most
-                            recent 20 trading days.
-                        </b>
+                        Volume-Weighted ROC:
+                        Momentum calculated using price changes
+                        weighted by trading volume over the most
+                        recent 20 trading days.
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
-            # st.markdown(
-            #     f"""
-            #     <div class="metric-card" style="border-left:5px solid {momentum_color};">
-            #         <div class="metric-title">
-            #             20-Day Momentum
-            #         </div>
-        
-            #         <div class="metric-value" style="color:{momentum_color};">
-            #             Volume-Weighted ROC
-            #         </div>
-        
-            #         <div class="metric-sub">
-            #             Momentum calculated using price changes
-            #             weighted by trading volume over the most
-            #             recent 20 trading days.
-            #         </div>
-            #     </div>
-            #     """,
-            #     unsafe_allow_html=True
-            # )
         
             # Formula outside HTML so LaTeX renders correctly
             st.latex(
@@ -464,14 +442,10 @@ def main():
             st.markdown(
                 f"""
                 <div class="metric-card" style="border-left:5px solid {dma_color};">
-                    <div class="metric-title">
-                        % Change &lt;N&gt;DMA
-                    </div>
-        
+                    <div class="metric-title">% Change &lt;N&gt;DMA</div>
                     <div class="metric-value" style="color:{dma_color};">
                         Price vs Moving Average
                     </div>
-        
                     <div class="metric-sub">
                         Shows how far the current price sits
                         above or below its N-day moving average.
