@@ -624,6 +624,8 @@ def main():
     with st.container(border=True):
         view_label = st.radio("Select View Type", list(VIEW_LABELS.values()), horizontal=True)
         view_value = next(k for k, v in VIEW_LABELS.items() if v == view_label)
+    
+    pred_value = "no"
 
     col3, col4 = st.columns(2)
     with col3:
