@@ -603,23 +603,26 @@ def main():
 
     
     # ---- Selection controls -------------------------------------------------
-    col1, col2 = st.columns(2)
-    with col1:
-        view_label = st.radio("Select View Type", list(VIEW_LABELS.values()), horizontal=True)
-        view_value = next(k for k, v in VIEW_LABELS.items() if v == view_label)
-    with col2:
-        pred_label = st.radio(
-            "Analyst Prediction",
-            ["Don't Want Future Prediction", "Future Prediction"],
-            horizontal=True,
-        )
-        pred_value = "yes" if pred_label == "Future Prediction" else "no"
-        if pred_value == "yes":
-            st.caption(
-                "⚠️ Future-prediction pulls best-effort analyst-estimate data from a "
-                "third-party page per stock — it's slower and can silently skip stocks "
-                "if that page is unavailable."
-            )
+    # col1, col2 = st.columns(2)
+    # with col1:
+    #     view_label = st.radio("Select View Type", list(VIEW_LABELS.values()), horizontal=True)
+    #     view_value = next(k for k, v in VIEW_LABELS.items() if v == view_label)
+    # with col2:
+    #     pred_label = st.radio(
+    #         "Analyst Prediction",
+    #         ["Don't Want Future Prediction", "Future Prediction"],
+    #         horizontal=True,
+    #     )
+    #     pred_value = "yes" if pred_label == "Future Prediction" else "no"
+    #     if pred_value == "yes":
+    #         st.caption(
+    #             "⚠️ Future-prediction pulls best-effort analyst-estimate data from a "
+    #             "third-party page per stock — it's slower and can silently skip stocks "
+    #             "if that page is unavailable."
+    #         )
+
+    view_label = st.radio("Select View Type", list(VIEW_LABELS.values()), horizontal=True)
+    view_value = next(k for k, v in VIEW_LABELS.items() if v == view_label)
 
     col3, col4 = st.columns(2)
     with col3:
