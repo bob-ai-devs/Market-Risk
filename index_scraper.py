@@ -621,31 +621,36 @@ def main():
     #             "if that page is unavailable."
     #         )
 
-    view_label = st.radio("Select View Type", list(VIEW_LABELS.values()), horizontal=True)
-    view_value = next(k for k, v in VIEW_LABELS.items() if v == view_label)
+    with st.container(border=True):
+        view_label = st.radio("Select View Type", list(VIEW_LABELS.values()), horizontal=True)
+        view_value = next(k for k, v in VIEW_LABELS.items() if v == view_label)
 
     col3, col4 = st.columns(2)
     with col3:
-        category = st.selectbox(
-            "Choose a category",
-            options=list(CATEGORY_LABELS.keys()),
-            format_func=lambda k: CATEGORY_LABELS[k],
-        )
+        with st.container(border=True):
+            category = st.selectbox(
+                "Choose a category",
+                options=list(CATEGORY_LABELS.keys()),
+                format_func=lambda k: CATEGORY_LABELS[k],
+            )
     with col4:
-        display_options = CATEGORY_DISPLAY_NAMES[category]
-        display_name = st.selectbox("Choose an index", options=display_options)
-        if display_name != st.session_state.display_name:
-            st.session_state["final_df"] = pd.DataFrame()
-        st.session_state.display_name = display_name
+        with st.container(border=True):
+            display_options = CATEGORY_DISPLAY_NAMES[category]
+            display_name = st.selectbox("Choose an index", options=display_options)
+            if display_name != st.session_state.display_name:
+                st.session_state["final_df"] = pd.DataFrame()
+            st.session_state.display_name = display_name
 
     col5, col6 = st.columns(2)
     with col5:
-        ai_flagging = st.radio("AI Continuous Flagging", ["Not Needed", "Needed"], horizontal=True)
+        with st.container(border=True):
+            ai_flagging = st.radio("AI Continuous Flagging", ["Not Needed", "Needed"], horizontal=True)
     with col6:
-        model_names = _cached_model_names(api_key) if api_key else []
-        # model_name = st.selectbox("AI model", options=["Default Model"] + model_names)
-        model_name = st.selectbox("AI model", options=model_names)
-        model_name = "" if model_name == "Default Model" else model_name
+        with st.container(border=True):
+            model_names = _cached_model_names(api_key) if api_key else []
+            # model_name = st.selectbox("AI model", options=["Default Model"] + model_names)
+            model_name = st.selectbox("AI model", options=model_names)
+            model_name = "" if model_name == "Default Model" else model_name
 
     run_clicked = st.button("Run Analysis", type="primary")
 
