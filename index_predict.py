@@ -39,6 +39,8 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.models import load_model
 import plotly.graph_objects as go
 
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
 # --------------------------------------------------------------------------- #
 # Config
 # --------------------------------------------------------------------------- #
