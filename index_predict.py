@@ -64,7 +64,7 @@ def _rmse_metric(y_true, y_pred):
 
 @st.cache_resource(show_spinner="Loading prediction model...")
 def get_model(model_path: str):
-    return load_model(model_path, custom_objects={"rmse": _rmse_metric, "OrthogonalInitializer": keras.initializers.Orthogonal})
+    return load_model(model_path, custom_objects={"rmse": _rmse_metric, "OrthogonalInitializer": tf.keras.initializers.Orthogonal})
 
 
 # --------------------------------------------------------------------------- #
