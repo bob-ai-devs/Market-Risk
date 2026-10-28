@@ -38,6 +38,7 @@ from sklearn.preprocessing import MinMaxScaler
 from streamlit_autorefresh import st_autorefresh
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import load_model
+from tensorflow.keras.initializers import Orthogonal
 import plotly.graph_objects as go
 
 
@@ -64,7 +65,7 @@ def _rmse_metric(y_true, y_pred):
 
 @st.cache_resource(show_spinner="Loading prediction model...")
 def get_model(model_path: str):
-    return load_model(model_path, custom_objects={"rmse": _rmse_metric, "OrthogonalInitializer": tensorflow.keras.initializers.Orthogonal})
+    return load_model(model_path, custom_objects={"rmse": _rmse_metric, "OrthogonalInitializer": Orthogonal})
 
 
 # --------------------------------------------------------------------------- #
