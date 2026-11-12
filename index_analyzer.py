@@ -13,7 +13,7 @@ client = None
 
 try: 
     gemini_api = st.secrets["GEMINI_API_KEY"] 
-    client = genai.Client(api_key=gemini_api) 
+    client = genai.Client(api_key=gemini_api, http_options=types.HttpOptions(api_version="v1beta")) 
 except Exception as e: 
     st.warning("Gemini API key is not configured correctly.") 
     st.caption( f"Gemini configuration: {e}" )
