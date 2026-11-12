@@ -22,14 +22,12 @@ Expected repo layout:
     models/best_model-3.keras   <-- your trained model
 
 Python 3.12 notes:
-    Uses the standalone `tf_keras` package (legacy Keras 2) so the model
-    loads without the Keras 3 / TensorFlow circular-import problem.
+    The model was saved with Keras 3, so it is loaded with Keras 3
+    (`keras` + `tensorflow==2.18.0`). Do NOT use tf_keras / TF_USE_LEGACY_KERAS.
 """
 
 import os
 
-# Must be set BEFORE tensorflow / tf_keras is imported anywhere.
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 
 import datetime
@@ -44,9 +42,7 @@ from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 from sklearn.preprocessing import MinMaxScaler
 from streamlit_autorefresh import st_autorefresh
 
-from tf_keras import backend as K
-from tf_keras.initializers import Orthogonal
-from tf_keras.models import load_model
+import keras
 
 
 # --------------------------------------------------------------------------- #
@@ -78,21 +74,11 @@ DEFAULT_MODEL_PATH = _default_model_path()
 # Model loading
 # --------------------------------------------------------------------------- #
 
-def _rmse_metric(y_true, y_pred):
-    """Custom Keras metric the model was trained/saved with."""
-    return K.sqrt(K.mean(K.square(y_true - y_pred)))
-
-
 @st.cache_resource(show_spinner="Loading prediction model...")
 def get_model(model_path: str):
-    return load_model(
-        model_path,
-        custom_objects={
-            "rmse": _rmse_metric,
-            "OrthogonalInitializer": Orthogonal,
-            "Orthogonal": Orthogonal,
-        },
-    )
+    # compile=False: we only run inference, so the saved optimizer/loss/custom
+    # 'rmse' metric are not needed. This also avoids custom-object errors.
+    return keras.saving.load_model(model_path, compile=False)
 
 
 # --------------------------------------------------------------------------- #
