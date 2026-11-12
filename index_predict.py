@@ -11,8 +11,7 @@ The app:
      predict the next Nifty 50 close.
   3. Shows current value / predicted value / trend / error metrics,
      a rolling-average chart, and a sortable prediction-history table.
-  4. Auto-refreshes on a configurable interval (replaces the old
-     Flask `setInterval` + `/refresh-index-predict` JS polling).
+  4. Auto-refreshes on a configurable interval.
 
 Run with:
     streamlit run app.py
@@ -21,25 +20,33 @@ Expected repo layout:
     app.py
     requirements.txt
     models/best_model-3.keras   <-- your trained model
+
+Python 3.12 notes:
+    Uses the standalone `tf_keras` package (legacy Keras 2) so the model
+    loads without the Keras 3 / TensorFlow circular-import problem.
 """
 
-import datetime
 import os
+
+# Must be set BEFORE tensorflow / tf_keras is imported anywhere.
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import datetime
 
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import pytz
 import streamlit as st
 import yfinance as yf
-from matplotlib import pyplot as plt
 from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
 from sklearn.preprocessing import MinMaxScaler
 from streamlit_autorefresh import st_autorefresh
-from tensorflow.keras import backend as K
-from tensorflow.keras.models import load_model
-from tensorflow.keras.initializers import Orthogonal
-import plotly.graph_objects as go
+
+from tf_keras import backend as K
+from tf_keras.initializers import Orthogonal
+from tf_keras.models import load_model
 
 
 # --------------------------------------------------------------------------- #
@@ -51,7 +58,20 @@ NAMES = ["dow", "nasdaq", "crude", "sp500", "nifty50", "nifty_it"]
 NIFTY_COL_INDEX = NAMES.index("nifty50")  # position of nifty50 among the (no-date) feature columns
 LOOKBACK_DAYS = 31  # matches the original full_data[-31:] window
 
-DEFAULT_MODEL_PATH = os.environ.get("MODEL_PATH", "models/best_model.keras")
+
+def _default_model_path() -> str:
+    """Use MODEL_PATH env var if set, else the first existing known filename."""
+    env_path = os.environ.get("MODEL_PATH")
+    if env_path:
+        return env_path
+    candidates = ["models/best_model-3.keras", "models/best_model.keras"]
+    for path in candidates:
+        if os.path.exists(path):
+            return path
+    return candidates[0]
+
+
+DEFAULT_MODEL_PATH = _default_model_path()
 
 
 # --------------------------------------------------------------------------- #
@@ -65,7 +85,14 @@ def _rmse_metric(y_true, y_pred):
 
 @st.cache_resource(show_spinner="Loading prediction model...")
 def get_model(model_path: str):
-    return load_model(model_path, custom_objects={"rmse": _rmse_metric, "OrthogonalInitializer": Orthogonal, "Orthogonal": Orthogonal})
+    return load_model(
+        model_path,
+        custom_objects={
+            "rmse": _rmse_metric,
+            "OrthogonalInitializer": Orthogonal,
+            "Orthogonal": Orthogonal,
+        },
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -252,14 +279,9 @@ def update_rolling_averages(curr_org):
 # --------------------------------------------------------------------------- #
 
 def render_metrics(stats):
-
     trend_color = "#198754" if stats["current_trend_up"] else "#dc3545"
     pred_color = "#198754" if stats["pred_trend_up"] else "#dc3545"
-    similarity_color = (
-        "#198754"
-        if stats["correct_pred"] == "Same"
-        else "#dc3545"
-    )
+    similarity_color = "#198754" if stats["correct_pred"] == "Same" else "#dc3545"
 
     if stats["same_perc"] > 50:
         perc_color = "#198754"
@@ -270,43 +292,37 @@ def render_metrics(stats):
 
     # Card CSS
     st.markdown(
-        f"""
+        """
         <style>
-        .metric-card {{
+        .metric-card {
             background: #ffffff;
             border-radius: 10px;
             padding: 12px 16px;
             margin-bottom: 10px;
             border: 1px solid #e5e5e5;
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }}
-
-        .metric-title {{
+        }
+        .metric-title {
             font-size: 14px;
             font-weight: 600;
             color: #555555;
-        }}
-
-        .metric-value {{
+        }
+        .metric-value {
             font-size: 25px;
             font-weight: 700;
             margin-top: 5px;
-        }}
-
-        .metric-sub {{
+        }
+        .metric-sub {
             font-size: 13px;
             color: #555555;
             margin-top: 5px;
-        }}
+        }
         </style>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
-    # ============================================================
     # ROW 1
-    # ============================================================
-
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -319,13 +335,11 @@ def render_metrics(stats):
                 </div>
                 <div class="metric-sub">
                     Current Trend:
-                    <b style="color:{trend_color};">
-                        {stats["current_trend"]}
-                    </b>
+                    <b style="color:{trend_color};">{stats["current_trend"]}</b>
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     with col2:
@@ -338,13 +352,11 @@ def render_metrics(stats):
                 </div>
                 <div class="metric-sub">
                     Predicted Trend:
-                    <b style="color:{pred_color};">
-                        {stats["pred_trend"]}
-                    </b>
+                    <b style="color:{pred_color};">{stats["pred_trend"]}</b>
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     with col3:
@@ -357,19 +369,14 @@ def render_metrics(stats):
                 </div>
                 <div class="metric-sub">
                     Trend Similarity:
-                    <b style="color:{similarity_color};">
-                        {stats["correct_pred"]}
-                    </b>
+                    <b style="color:{similarity_color};">{stats["correct_pred"]}</b>
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-    # ============================================================
     # ROW 2
-    # ============================================================
-
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -382,82 +389,50 @@ def render_metrics(stats):
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     with col2:
         st.markdown(
-            """
+            f"""
             <div class="metric-card" style="border-left:5px solid #0059b3;">
                 <div class="metric-title">Mean Absolute Error</div>
                 <div class="metric-value" style="color:#0059b3;">
-                    """ + str(stats["mae"]) + """
+                    {stats["mae"]}
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     with col3:
         st.markdown(
-            """
+            f"""
             <div class="metric-card" style="border-left:5px solid #6f42c1;">
                 <div class="metric-title">Root Mean Squared Error</div>
                 <div class="metric-value" style="color:#6f42c1;">
-                    """ + str(stats["rmse"]) + """
+                    {stats["rmse"]}
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-    # ============================================================
     # ROW 3
-    # ============================================================
-
     _, col1, _ = st.columns(3)
 
     with col1:
         st.markdown(
-            """
+            f"""
             <div class="metric-card" style="border-left:5px solid #e67e22;">
                 <div class="metric-title">Mean Absolute % Error</div>
                 <div class="metric-value" style="color:#e67e22;">
-                    """ + str(stats["mape"]) + """%
+                    {stats["mape"]}%
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
-
-
-
-
-
-
-
-# def render_averages_chart():
-#     ss = st.session_state
-#     if len(ss.avg_curr) < 2:
-#         st.info("The rolling-average chart will appear after a couple of refresh cycles.")
-#         return
-
-#     fig, ax = plt.subplots(figsize=(10, 5))
-#     ax.plot(ss.avg_curr, label="Current", color="lightblue")
-#     ax.plot(ss.avg_30s, label="30s", color="green", linestyle="dashed")
-#     ax.plot(ss.avg_1m, label="1m", color="gold", linestyle="dashed")
-#     ax.plot(ss.avg_2m, label="2m", color="blue", linestyle="dashed")
-#     ax.plot(ss.avg_3m, label="3m", color="magenta", linestyle="dashed")
-#     ax.plot(ss.avg_5m, label="5m", color="deepskyblue", linestyle="dashed")
-#     ax.plot(ss.avg_10m, label="10m", color="red", linestyle="dashed")
-#     ax.plot(ss.avg_total, label="Total", color="plum", linestyle="dashed")
-#     ax.set_xlabel("Refresh cycle")
-#     ax.set_ylabel("Average value")
-#     ax.set_title("Current value vs. rolling averages")
-#     ax.legend()
-#     ax.grid(True)
-#     st.pyplot(fig)
-#     plt.close(fig)
 
 
 def render_averages_chart():
@@ -487,28 +462,21 @@ def render_averages_chart():
                 y=list(values),
                 mode="lines",
                 name=name,
-                line=dict(
-                    color=color,
-                    dash=dash
-                ),
+                line=dict(color=color, dash=dash),
                 hovertemplate=(
                     f"<b>{name}</b><br>"
                     "Refresh cycle: %{x}<br>"
                     "Value: %{y:.2f}"
                     "<extra></extra>"
-                )
+                ),
             )
         )
 
-    # ========================================================
-    # HIGHEST / LOWEST CURRENT VALUE
-    # ========================================================
+    # Highest / lowest current value
     curr_values = list(ss.avg_curr)
-
     highest_curr = max(curr_values)
     lowest_curr = min(curr_values)
 
-    # Very light green horizontal line for highest Current
     fig.add_hline(
         y=highest_curr,
         line_color="#b7e4c7",
@@ -516,13 +484,9 @@ def render_averages_chart():
         line_dash="dot",
         annotation_text=f"Highest: {highest_curr:.2f}",
         annotation_position="top right",
-        annotation_font=dict(
-            color="#7fba8f",
-            size=11
-        )
+        annotation_font=dict(color="#7fba8f", size=11),
     )
 
-    # Very light red horizontal line for lowest Current
     fig.add_hline(
         y=lowest_curr,
         line_color="#f5b7b1",
@@ -530,43 +494,24 @@ def render_averages_chart():
         line_dash="dot",
         annotation_text=f"Lowest: {lowest_curr:.2f}",
         annotation_position="bottom right",
-        annotation_font=dict(
-            color="#d98b85",
-            size=11
-        )
+        annotation_font=dict(color="#d98b85", size=11),
     )
 
     fig.update_layout(
-        title=f"Current value vs. rolling averages (Cycle: {len(values)})",
+        title=f"Current value vs. rolling averages (Cycle: {len(curr_values)})",
         xaxis_title="Refresh cycle",
         yaxis_title="Average value",
         hovermode="x unified",
         height=450,
         margin=dict(l=50, r=20, t=60, b=50),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="left",
-            x=0
-        )
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
     )
 
-    fig.update_xaxes(
-        showgrid=True,
-        # rangeslider=dict(visible=True)
-    )
+    fig.update_xaxes(showgrid=True)
+    fig.update_yaxes(showgrid=True)
 
-    fig.update_yaxes(
-        showgrid=True
-    )
+    st.plotly_chart(fig, use_container_width=True, key="averages_interactive_chart")
 
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        key="averages_interactive_chart"
-    )
-  
 
 def render_table(merged_data: pd.DataFrame):
     st.subheader("Prediction history (last 30 trading days)")
@@ -604,8 +549,6 @@ def main():
     if auto_refresh:
         st_autorefresh(interval=refresh_seconds * 1000, key="data_autorefresh")
 
-    # st.title("🔮 StockAlert \u2014 Nifty 50 Next-Close Predictor")
-    # st.caption("Live prediction dashboard (converted from the original Flask app).")
     st.markdown(
         """
         <div id="bob-banner">
@@ -630,39 +573,38 @@ def main():
 
     update_rolling_averages(stats["curr_org"])
 
-    up_arrow = "\u2191"      # ↑
-    down_arrow = "\u2193"    # ↓
-    equal_arrow = "\u2194"   # ↔
-    
+    up_arrow = "\u2191"
+    down_arrow = "\u2193"
+    equal_arrow = "\u2194"
+
     render_metrics(stats)
     st.divider()
-    
+
     col1, col2 = st.columns([4, 1])
-    
+
     with col1:
         render_averages_chart()
-    
+
     with col2:
         with st.container(border=True):
-    
-            curr = st.session_state.avg_curr[-1]
-    
-            avg_30s = st.session_state.avg_30s[-1]
-            avg_1m = st.session_state.avg_1m[-1]
-            avg_2m = st.session_state.avg_2m[-1]
-            avg_3m = st.session_state.avg_3m[-1]
-            avg_5m = st.session_state.avg_5m[-1]
-            avg_10m = st.session_state.avg_10m[-1]
-            avg_total = st.session_state.avg_total[-1]
-    
+            ss = st.session_state
+            curr = ss.avg_curr[-1]
+
+            avg_30s = ss.avg_30s[-1]
+            avg_1m = ss.avg_1m[-1]
+            avg_2m = ss.avg_2m[-1]
+            avg_3m = ss.avg_3m[-1]
+            avg_5m = ss.avg_5m[-1]
+            avg_10m = ss.avg_10m[-1]
+            avg_total = ss.avg_total[-1]
+
             def get_arrow(value):
                 if value > curr:
                     return up_arrow
                 elif value < curr:
                     return down_arrow
-                else:
-                    return equal_arrow
-    
+                return equal_arrow
+
             html = (
                 f'<div style="font-size:14px; line-height:1.9;">'
                 f'<div style="color:lightblue;"><b>● Current: {curr:.2f}</b></div>'
@@ -675,9 +617,9 @@ def main():
                 f'<div style="color:plum;"><b>● Total: {avg_total:.2f} {get_arrow(avg_total)}</b></div>'
                 f'</div>'
             )
-    
+
             st.markdown(html, unsafe_allow_html=True)
-    
+
     st.divider()
     render_table(merged_data)
 
