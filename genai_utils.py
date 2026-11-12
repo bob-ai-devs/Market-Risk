@@ -14,7 +14,7 @@ def get_client(api_key: str) -> genai.Client:
     """Create a genai Client. Cache this at the call site (e.g. st.cache_resource)."""
     if not api_key:
         raise ValueError("A Gemini API key is required (set GEMINI_API_KEY in secrets).")
-    return genai.Client(api_key=api_key)
+    return genai.Client(api_key=api_key, http_options=types.HttpOptions(api_version="v1beta"))
 
 
 def list_model_names(client: genai.Client):
