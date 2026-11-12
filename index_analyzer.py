@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 from google import genai
+from google.genai import types
 import json
 import numpy as np
 from stock_analytics import text_to_html
