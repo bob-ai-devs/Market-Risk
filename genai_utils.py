@@ -6,6 +6,7 @@ Docs: https://ai.google.dev/gemini-api/docs/sdks
 """
 
 from google import genai
+from google.genai import types
 
 DEFAULT_MODEL = "gemini-flash-lite-latest"
 
